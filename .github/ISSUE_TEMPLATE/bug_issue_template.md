@@ -1,6 +1,6 @@
-~~---
-name: bug_issue_template.md
-about: 버그 관련 이슈 템플릿
+---
+name: '🐛Bug: '
+about: '버그 관련 이슈 템플릿'
 title: '🐛Bug: '
 labels: '🐛bug'
 assignees: ''

@@ -1,6 +1,6 @@
-~~---
-name: fix_issue_template.md
-about: 수정 관련 이슈 템플릿
+---
+name: '🚨Fix: '
+about: '수정 관련 이슈 템플릿'
 title: '🚨Fix: '
 labels: '🚨fix'
 assignees: ''
