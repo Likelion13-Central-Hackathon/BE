@@ -1,5 +1,5 @@
 ~~---
-name: common_issue_template.md
+name: bug_issue_template.md
 about: 버그 관련 이슈 템플릿
 title: '🐛Bug: '
 labels: '🐛bug'
@@ -23,7 +23,7 @@ assignees: ''
 
 ## 📂 상세 내용
 <!--
-	ex) Github 소셜 로그인 401 오류를 해결했습니다.
+	ex) Github 소셜 로그인 시 401 오류를 발견했습니다.
 -->
 
 <br>
