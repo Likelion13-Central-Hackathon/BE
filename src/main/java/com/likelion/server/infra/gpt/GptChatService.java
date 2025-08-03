@@ -3,10 +3,12 @@ package com.likelion.server.infra.gpt;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
 public class GptChatService {
     private final OpenAiService openAiService;
