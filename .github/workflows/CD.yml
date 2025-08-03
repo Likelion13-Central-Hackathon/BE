@@ -13,6 +13,10 @@ jobs:
       # GPT
       OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
       OPENAI_TIMEOUT: ${{ secrets.OPENAI_TIMEOUT }}
+      # DB
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
