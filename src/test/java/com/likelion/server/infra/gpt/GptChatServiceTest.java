@@ -1,18 +1,24 @@
 package com.likelion.server.infra.gpt;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class GptChatServiceTest {
 
     @Autowired
     private GptChatService gptChatService;
 
+    @Tag("integration")
+    @Disabled("로컬에서만 GPT 호출 테스트 허용")
     @Test
-    @DisplayName("GPT에게 창업 서류 문항을 질문하면 실제 응답과 소요 시간을 출력한다")
+    @DisplayName("GPT 실제 호출 테스트")
     void gpt_응답_정답호출_테스트() {
         // given
         String prompt = "너는 창업 지원 서류를 대신 작성해주는 전문가야. " +
