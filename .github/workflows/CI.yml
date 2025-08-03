@@ -12,6 +12,15 @@ jobs:
 
     # 필요한 secrets 값들 관리
     env:
+      # DB
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.h2.Driver
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD:
+      # JPA
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+      SPRING_JPA_SHOW_SQL: true
+      # GPT
       OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
       OPENAI_TIMEOUT: ${{ secrets.OPENAI_TIMEOUT }}
 
@@ -28,7 +37,7 @@ jobs:
 
       # Gradle 테스트 실행
       - name: Run Tests
-        run: ./gradlew clean test --info --stacktrace
+        run: ./gradlew clean test -Dspring.profiles.active=test --info --stacktrace
 
       # 테스트 실패 시 HTML 리포트 업로드
       - name: Upload Test Report (on failure)
