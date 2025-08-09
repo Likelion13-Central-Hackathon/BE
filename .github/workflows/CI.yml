@@ -23,6 +23,9 @@ jobs:
       # GPT
       OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
       OPENAI_TIMEOUT: ${{ secrets.OPENAI_TIMEOUT }}
+      # NAVER API
+      NAVER_API_CLIENT_ID: ${{NAVER_API_CLIENT_ID}}
+      NAVER_API_CLIENT_SECRET: ${{NAVER_API_CLIENT_SECRET}}
 
     steps:
       # GitHub 저장소 코드 체크아웃
