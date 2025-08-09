@@ -21,8 +21,8 @@ jobs:
       DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
       # NAVER API
-      NAVER_API_CLIENT_ID: ${{NAVER_API_CLIENT_ID}}
-      NAVER_API_CLIENT_SECRET: ${{NAVER_API_CLIENT_SECRET}}
+      NAVER_API_CLIENT_ID: ${{ secrets.NAVER_API_CLIENT_ID }}
+      NAVER_API_CLIENT_SECRET: ${{ secrets.NAVER_API_CLIENT_SECRET }}
 
     steps:
       - uses: actions/checkout@v4
