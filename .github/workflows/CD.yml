@@ -20,9 +20,8 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-      # NAVER API
-      NAVER_API_CLIENT_ID: ${{ secrets.NAVER_API_CLIENT_ID }}
-      NAVER_API_CLIENT_SECRET: ${{ secrets.NAVER_API_CLIENT_SECRET }}
+      # PPLX
+      PPLX_API_KEY: ${{ secrets.PPLX_KEY }}
 
     steps:
       - uses: actions/checkout@v4
