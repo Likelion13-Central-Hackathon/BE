@@ -1,3 +1,8 @@
+# ERD
+
+# API 명세서
+https://www.notion.so/hyejinworkspace/API-2245f14ba7a580cbbb36fc97988ee575
+
 # 커밋 및 브랜치, 이슈 규칙 (Commit, Branch, and Issue Convention)
 
 ## ✉️ 커밋 태그 설명
