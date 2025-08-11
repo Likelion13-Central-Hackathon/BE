@@ -7,6 +7,7 @@ import com.likelion.server.domain.idea.repository.IdeaRepository;
 import com.likelion.server.domain.idea.repository.NeedRepository;
 import com.likelion.server.domain.idea.repository.ResourceRepository;
 import com.likelion.server.domain.idea.web.dto.CreateIdeaRequest;
+import com.likelion.server.domain.idea.web.dto.CreateIdeaResponse;
 import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -23,7 +24,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     @Transactional
-    public Long create(CreateIdeaRequest createRequest) {
+    public CreateIdeaResponse create(CreateIdeaRequest createRequest) {
         // 1. User 생성
         User user = User.builder()
                 .email(null) // 추후 회원가입 진행 시 추가 예정
@@ -60,6 +61,6 @@ public class IdeaServiceImpl implements IdeaService {
         });
 
         // 5. ideaId 반환
-        return savedIdea.getId();
+        return new CreateIdeaResponse(savedIdea.getId());
     }
 }
