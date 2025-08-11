@@ -17,13 +17,13 @@ public class User extends BaseEntity {
     private Long id;
 
     @Column(unique = true)
-    private String email;
+    private String email; // 이메일
 
-    private String password;
+    private String password; // 비밀번호
 
-    private int age;
+    private int age; // 나이
 
-    private String university;
+    private String university; // 대학교
 
     @Enumerated(EnumType.STRING)
     private AcademicStatus academicStatus; // 학적
