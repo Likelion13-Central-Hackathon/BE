@@ -21,9 +21,8 @@ public final class PplxPrompts {
                 "- 검색어: '" + keyword + "'",
                 "- 기사 언어: 한국어",
                 "- 최신성: " + min + " ~ " + today + " (최근 2년 이내)",
-                "- 반환 형식(JSON): [{title, url, summary, source, date}]",
-                "- 개수: 3개",
-                "- summary는 3줄 이내 한국어 요약",
+                "- 반환 형식(JSON): [{title, url, source}]",
+                "- 개수: 2개",
                 "- source는 신문사/매체 이름(예: 조선일보, 한겨레 등)",
                 "- JSON 외 텍스트 출력 금지"
         );
