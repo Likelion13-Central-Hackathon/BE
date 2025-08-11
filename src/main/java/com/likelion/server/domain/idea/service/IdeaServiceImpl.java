@@ -44,9 +44,9 @@ public class IdeaServiceImpl implements IdeaService {
                 .build();
         Idea savedIdea = ideaRepository.save(idea);
 
-        // 3. Needs 생성
+        // 3. Need 생성
 
-        // 4. Resources 생성
+        // 4. Resource 생성
 
         // 5. ideaId 반환
         return savedIdea.getId();

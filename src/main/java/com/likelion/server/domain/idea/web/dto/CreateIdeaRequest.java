@@ -14,7 +14,7 @@ public record CreateIdeaRequest(
         String university, // isEnrolled=false -> null
         AcademicStatus academicStatus, // isEnrolled=false -> null
         @NotBlank String interestArea, // 관심분야
-        @NotNull Map<SupportNeedType, Level> supportNeeds, // 필요한 자원들(자원이름, 레벨)
+        @NotNull Map<NeedType, Level> supportNeeds, // 필요한 자원들(자원이름, 레벨)
         @NotNull BusinessAge businessAge,
         @NotNull Stage stage, // 창업현황
         @NotBlank String description,

@@ -1,7 +1,7 @@
 package com.likelion.server.domain.idea.entity;
 
 import com.likelion.server.domain.idea.entity.enums.Level;
-import com.likelion.server.domain.idea.entity.enums.NeedsLabel;
+import com.likelion.server.domain.idea.entity.enums.ResourceType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,14 +10,16 @@ import lombok.*;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Needs {
+public class Resource {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // Idea 1:N Needs
+    // Ideas 1:N Resource
     @ManyToOne(fetch = FetchType.LAZY)
     private Idea idea;
     // 지원 항목명
-    private NeedsLabel label;
+    @Enumerated(EnumType.STRING)
+    private ResourceType label;
     // 레벨
+    @Enumerated(EnumType.STRING)
     private Level level;
 }

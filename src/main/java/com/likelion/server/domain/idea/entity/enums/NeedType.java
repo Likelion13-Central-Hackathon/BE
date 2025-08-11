@@ -1,6 +1,6 @@
 package com.likelion.server.domain.idea.entity.enums;
 
-public enum SupportNeedType {
+public enum NeedType {
     COMMERCIALIZATION,      // 사업화
     RND,                    // 기술개발(R&D)
     FACILITY_INCUBATION,    // 시설·공간·보육
