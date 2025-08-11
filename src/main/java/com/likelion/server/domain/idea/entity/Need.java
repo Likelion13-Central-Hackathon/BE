@@ -10,6 +10,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "needs")
 public class Need {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

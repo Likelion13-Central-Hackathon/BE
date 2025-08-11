@@ -36,18 +36,7 @@ public class IdeaServiceImpl implements IdeaService {
         User savedUser = userRepository.save(user);
 
         // 2. Idea 생성
-        Idea idea = Idea.builder()
-                .user(savedUser)
-                .addressCity(createRequest.addressCity())
-                .addressDistrict(createRequest.addressDistrict())
-                .interestArea(createRequest.interestArea())
-                .businessAge(createRequest.businessAge())
-                .stage(createRequest.stage())
-                .description(createRequest.description())
-                .teamSize(createRequest.teamSize())
-                .capital(createRequest.capital())
-                .receiveNotification(false) // 기본값
-                .build();
+        Idea idea = Idea.toEntity(createRequest, savedUser);
         Idea savedIdea = ideaRepository.save(idea);
 
         // 3. Need 생성

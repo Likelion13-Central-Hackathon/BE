@@ -4,6 +4,7 @@ import com.likelion.server.domain.idea.entity.enums.BusinessAge;
 import com.likelion.server.domain.idea.entity.enums.Capital;
 import com.likelion.server.domain.idea.entity.enums.Stage;
 import com.likelion.server.domain.idea.entity.enums.TeamSize;
+import com.likelion.server.domain.idea.web.dto.CreateIdeaRequest;
 import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -41,7 +42,24 @@ public class Idea extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TeamSize teamSize;
     // 보유자본(단위 만원)
+    @Enumerated(EnumType.STRING)
     private Capital capital;
     // 알림 수신 여부
     private boolean receiveNotification;
+
+    // CreateIdeaRequest -> Entity
+    public static Idea toEntity(CreateIdeaRequest req, User user) {
+        return Idea.builder()
+                .user(user)
+                .addressCity(req.addressCity())
+                .addressDistrict(req.addressDistrict())
+                .interestArea(req.interestArea())
+                .businessAge(req.businessAge())
+                .stage(req.stage())
+                .description(req.description())
+                .teamSize(req.teamSize())
+                .capital(req.capital())
+                .receiveNotification(false)
+                .build();
+    }
 }
