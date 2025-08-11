@@ -3,7 +3,6 @@ package com.likelion.server.domain.idea.service;
 import com.likelion.server.domain.idea.entity.Idea;
 import com.likelion.server.domain.idea.entity.Need;
 import com.likelion.server.domain.idea.entity.Resource;
-import com.likelion.server.domain.idea.exception.UniversityConditionViolationException;
 import com.likelion.server.domain.idea.repository.IdeaRepository;
 import com.likelion.server.domain.idea.repository.NeedRepository;
 import com.likelion.server.domain.idea.repository.ResourceRepository;
@@ -62,7 +61,7 @@ public class IdeaServiceImpl implements IdeaService {
             resourceRepository.save(resource);
         });
 
-        // 5. ideaId 반환
+        // 5. return
         return new CreateIdeaResponse(savedIdea.getId());
     }
 }

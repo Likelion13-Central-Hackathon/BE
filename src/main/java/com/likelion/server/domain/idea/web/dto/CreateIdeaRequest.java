@@ -7,7 +7,6 @@ import java.util.Map;
 
 // 창업 아이디어 생성 Request Dto
 public record CreateIdeaRequest(
-        @NotBlank(message = "int는 필수 입력 값입니다.")
         int age,
 
         @NotBlank(message = "addressCity는 필수 입력 값입니다.")

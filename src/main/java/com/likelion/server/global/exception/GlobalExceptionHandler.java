@@ -1,5 +1,6 @@
 package com.likelion.server.global.exception;
 
+import com.likelion.server.domain.idea.exception.IdeaInvalidEnumException;
 import com.likelion.server.global.response.ErrorResponse;
 import com.likelion.server.global.response.code.GlobalErrorCode;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +70,6 @@ public class GlobalExceptionHandler {
         ErrorResponse error = ErrorResponse.of(e.getErrorCode());
         return ResponseEntity.status(error.getHttpStatus()).body(error);
     }
-
 
     /* 나머지 예외 처리 */
     @ExceptionHandler(Exception.class)
