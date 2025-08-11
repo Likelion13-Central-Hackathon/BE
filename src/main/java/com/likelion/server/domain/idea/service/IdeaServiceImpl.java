@@ -2,7 +2,10 @@ package com.likelion.server.domain.idea.service;
 
 import com.likelion.server.domain.idea.entity.Idea;
 import com.likelion.server.domain.idea.entity.Need;
+import com.likelion.server.domain.idea.entity.Resource;
 import com.likelion.server.domain.idea.repository.IdeaRepository;
+import com.likelion.server.domain.idea.repository.NeedRepository;
+import com.likelion.server.domain.idea.repository.ResourceRepository;
 import com.likelion.server.domain.idea.web.dto.CreateIdeaRequest;
 import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.domain.user.repository.UserRepository;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Service;
 public class IdeaServiceImpl implements IdeaService {
     private final UserRepository userRepository;
     private final IdeaRepository ideaRepository;
+    private final NeedRepository needRepository;
+    private final ResourceRepository resourceRepository;
 
     @Override
     @Transactional
@@ -46,11 +51,26 @@ public class IdeaServiceImpl implements IdeaService {
         Idea savedIdea = ideaRepository.save(idea);
 
         // 3. Need 생성
+        createRequest.supportNeeds().forEach((label, level) -> {
+            Need need = Need.builder()
+                    .idea(savedIdea)
+                    .label(label)
+                    .level(level)
+                    .build();
+            needRepository.save(need);
+        });
 
         // 4. Resource 생성
+        createRequest.resources().forEach((label, level) -> {
+            Resource resource = Resource.builder()
+                    .idea(savedIdea)
+                    .label(label)
+                    .level(level)
+                    .build();
+            resourceRepository.save(resource);
+        });
 
         // 5. ideaId 반환
         return savedIdea.getId();
-
     }
 }
