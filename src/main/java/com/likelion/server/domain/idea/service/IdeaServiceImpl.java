@@ -1,6 +1,7 @@
 package com.likelion.server.domain.idea.service;
 
 import com.likelion.server.domain.idea.entity.Idea;
+import com.likelion.server.domain.idea.entity.Need;
 import com.likelion.server.domain.idea.repository.IdeaRepository;
 import com.likelion.server.domain.idea.web.dto.CreateIdeaRequest;
 import com.likelion.server.domain.user.entity.User;
