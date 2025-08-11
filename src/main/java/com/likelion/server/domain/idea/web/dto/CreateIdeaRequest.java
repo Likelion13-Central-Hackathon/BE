@@ -19,6 +19,7 @@ public record CreateIdeaRequest(
         @NotNull Stage stage, // 창업현황
         @NotBlank String description,
         @NotNull TeamSize teamSize,
+        @NotNull Capital capital,
         @NotNull Map<ResourceType, Level> resources // 활용 가능 자원들(자원이름, 레벨)
 ) {
 }

@@ -1,6 +1,7 @@
 package com.likelion.server.domain.idea.entity;
 
 import com.likelion.server.domain.idea.entity.enums.BusinessAge;
+import com.likelion.server.domain.idea.entity.enums.Capital;
 import com.likelion.server.domain.idea.entity.enums.Stage;
 import com.likelion.server.domain.idea.entity.enums.TeamSize;
 import com.likelion.server.domain.user.entity.User;
@@ -40,7 +41,7 @@ public class Idea extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TeamSize teamSize; // 팀 구성원 수
 
-    private int capital; // 보유자본(단위 만원)
+    private Capital capital; // 보유자본(단위 만원)
 
     private boolean receiveNotification; // 알림 수신 여부
 
