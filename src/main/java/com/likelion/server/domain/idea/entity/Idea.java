@@ -19,30 +19,29 @@ public class Idea extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    // User 1:N Idea
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user; // 회원 고유 Id (User 1:N Idea)
-
-    private String addressCity; // 사업장 주소(시/도)
-
-    private String addressDistrict; // 사업장 주소(시/군/구)
-
-    private String interestArea; // 관심 분야
-
+    private User user;
+    // 사업장 주소(시/도)
+    private String addressCity;
+    // 사업장 주소(시/군/구)
+    private String addressDistrict;
+    // 관심 분야
+    private String interestArea;
+    // 업력
     @Enumerated(EnumType.STRING)
-    private BusinessAge businessAge; // 업력
-
+    private BusinessAge businessAge;
+    // 현재 창업 단계 (1~6)
     @Enumerated(EnumType.STRING)
-    private Stage stage; // 현재 창업 단계 (1~6)
-
+    private Stage stage;
+    // 아이템 설명
     @Lob
-    private String description; // 아이템 설명
-
+    private String description;
+    // 팀 구성원 수
     @Enumerated(EnumType.STRING)
-    private TeamSize teamSize; // 팀 구성원 수
-
-    private Capital capital; // 보유자본(단위 만원)
-
-    private boolean receiveNotification; // 알림 수신 여부
-
+    private TeamSize teamSize;
+    // 보유자본(단위 만원)
+    private Capital capital;
+    // 알림 수신 여부
+    private boolean receiveNotification;
 }

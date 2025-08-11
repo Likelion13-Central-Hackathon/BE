@@ -23,6 +23,8 @@ public class User extends BaseEntity {
 
     private int age; // 나이
 
+    private boolean isEnrolled; // 재학여부
+
     private String university; // 대학교
 
     @Enumerated(EnumType.STRING)

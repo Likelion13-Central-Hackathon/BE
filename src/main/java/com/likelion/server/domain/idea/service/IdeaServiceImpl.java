@@ -20,15 +20,16 @@ public class IdeaServiceImpl implements IdeaService {
     public Long create(CreateIdeaRequest createRequest) {
         // 1. User 생성
         User user = User.builder()
-                .email(null)
-                .password(null)
+                .email(null) // 추후 회원가입 진행 시 추가 예정
+                .password(null) // 추후 회원가입 진행 시 추가 예정
                 .age(createRequest.age())
+                .isEnrolled(createRequest.isEnrolled())
                 .university(createRequest.isEnrolled() ? createRequest.university() : null)
                 .academicStatus(createRequest.isEnrolled() ? createRequest.academicStatus() : null)
                 .build();
         User savedUser = userRepository.save(user);
 
-        // Idea 생성
+        // 2. Idea 생성
         Idea idea = Idea.builder()
                 .user(savedUser)
                 .addressCity(createRequest.addressCity())
@@ -43,7 +44,11 @@ public class IdeaServiceImpl implements IdeaService {
                 .build();
         Idea savedIdea = ideaRepository.save(idea);
 
-        // ideaId 반환
+        // 3. Needs 생성
+
+        // 4. Resources 생성
+
+        // 5. ideaId 반환
         return savedIdea.getId();
 
     }
