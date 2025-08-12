@@ -11,4 +11,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Optional<Report> findByIdea_User_EmailAndIdea_User_Password(
             String email, String password
     );
+
+    // Report ID로 리포트 조회
+    Optional<Report> findById(Long reportId);
 }
