@@ -17,7 +17,7 @@ public class ReportQueryController {
     private final ReportQueryService reportQueryService;
 
     // 최근 리포트 상세 조회
-    @GetMapping("/lastest")
+    @GetMapping("/latest")
     public SuccessResponse<ReportDetailResponse> getLatestReport(
             @RequestBody @Valid LatestReportDetailRequest request
     ) {
