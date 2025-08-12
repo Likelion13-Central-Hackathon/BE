@@ -2,7 +2,7 @@ package com.likelion.server.domain.report.web.dto;
 
 import java.util.List;
 
-public record LatestReportDetailResponse(
+public record ReportDetailResponse(
         Long id,
         Integer angle,
         String researchMethod,

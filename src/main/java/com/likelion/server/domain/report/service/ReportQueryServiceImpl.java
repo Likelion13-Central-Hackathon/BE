@@ -8,7 +8,7 @@ import com.likelion.server.domain.report.repository.NewsRepository;
 import com.likelion.server.domain.report.repository.RecommendedStartupSupportRepository;
 import com.likelion.server.domain.report.repository.ReportRepository;
 import com.likelion.server.domain.report.web.dto.LatestReportDetailRequest;
-import com.likelion.server.domain.report.web.dto.LatestReportDetailResponse;
+import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
 import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class ReportQueryServiceImpl implements ReportQueryService {
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
     @Override
-    public LatestReportDetailResponse getLatestReport(LatestReportDetailRequest request) {
+    public ReportDetailResponse getLatestReport(LatestReportDetailRequest request) {
         // 이메일/비밀번호로 회원 검증
         User user = userRepository.findByEmailAndPassword(request.email(), request.password())
                 .orElseThrow(AuthFailException::new);
@@ -44,7 +44,7 @@ public class ReportQueryServiceImpl implements ReportQueryService {
     }
 
     @Override
-    public LatestReportDetailResponse getById(Long reportId) {
+    public ReportDetailResponse getById(Long reportId) {
         // ID로 레포트 조회
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(ReportNotFoundByIdException::new);
@@ -52,7 +52,7 @@ public class ReportQueryServiceImpl implements ReportQueryService {
         return toResponse(report);
     }
 
-    private LatestReportDetailResponse toResponse(Report report) {
+    private ReportDetailResponse toResponse(Report report) {
         // steps 배열 생성
         List<String> steps = List.of(
                 report.getStep1(),
@@ -64,12 +64,12 @@ public class ReportQueryServiceImpl implements ReportQueryService {
         // 리포트에 연결된 뉴스 조회
         var newsDtos = newsRepository.findByReport(report).stream()
                 .limit(2)
-                .map(n -> new LatestReportDetailResponse.NewsDto(n.getTitle(), n.getLink()))
+                .map(n -> new ReportDetailResponse.NewsDto(n.getTitle(), n.getLink()))
                 .toList();
 
         // 추천 지원사업 적합도 순 3건 조회
         var recDtos = recommendedStartupSupportRepository.findTop3ByReportOrderBySuitabilityDesc(report).stream()
-                .map(r -> new LatestReportDetailResponse.RecommendationDto(
+                .map(r -> new ReportDetailResponse.RecommendationDto(
                         r.getStartupSupport().getTitle(),
                         formatOrNull(r.getStartupSupport().getStartDate()),
                         formatOrNull(r.getStartupSupport().getEndDate()),
@@ -78,7 +78,7 @@ public class ReportQueryServiceImpl implements ReportQueryService {
                 .toList();
 
         // 반환
-        return new LatestReportDetailResponse(
+        return new ReportDetailResponse(
                 report.getId(),
                 report.getAngle(),
                 report.getResearchMethod(),
