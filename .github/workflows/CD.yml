@@ -53,5 +53,20 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ~/BE
-            docker compose up -d --build
+          
+            cat > .env << 'EOF'
+            OPENAI_KEY=${{ secrets.OPENAI_KEY }}
+            OPENAI_TIMEOUT=${{ secrets.OPENAI_TIMEOUT }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}
+            DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+            MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            PPLX_KEY=${{ secrets.PPLX_KEY }}
+            EOF
+            
+            docker compose down
+            docker compose build --no-cache --pull
+            docker compose up -d
+            
             docker image prune -f
