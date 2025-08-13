@@ -1,8 +1,6 @@
 package com.likelion.server.domain.report.generator;
 
 import com.likelion.server.domain.idea.entity.Idea;
-import com.likelion.server.domain.idea.repository.NeedRepository;
-import com.likelion.server.domain.idea.repository.ResourceRepository;
 import com.likelion.server.domain.report.entity.Report;
 import com.likelion.server.infra.gpt.GptChatService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +15,7 @@ public class ReportGeneratorImpl implements ReportGenerator {
     private final GptChatService gptChatService;
 
     @Override
-    public Report generate(Idea idea, String ideaData) {
+    public Report generate(Idea idea, String ideaText) {
         // 1) 분석 각도 + 리서치 방법
         String anglePrompt = """
             다음 아이디어에 대해 두 가지 정보를 주세요.
@@ -30,7 +28,7 @@ public class ReportGeneratorImpl implements ReportGenerator {
 
             아이디어 정보:
             %s
-        """.formatted(ideaData);
+        """.formatted(ideaText);
         String angleResponse = gptChatService.chatSinglePrompt(anglePrompt);
         Integer angle = null;
         String researchMethod = null;
@@ -49,7 +47,7 @@ public class ReportGeneratorImpl implements ReportGenerator {
 
             아이디어 정보:
             %s
-        """.formatted(ideaData);
+        """.formatted(ideaText);
         String swotResponse = gptChatService.chatSinglePrompt(swotPrompt);
         String strength   = parseLine(swotResponse, "Strength");
         String weakness   = parseLine(swotResponse, "Weakness");
@@ -68,7 +66,7 @@ public class ReportGeneratorImpl implements ReportGenerator {
 
             아이디어 정보:
             %s
-        """.formatted(ideaData);
+        """.formatted(ideaText);
         String planResponse = gptChatService.chatSinglePrompt(planPrompt);
         String step1 = parseLine(planResponse, "Step1");
         String step2 = parseLine(planResponse, "Step2");

@@ -10,6 +10,7 @@ import com.likelion.server.domain.report.entity.Report;
 import com.likelion.server.domain.report.exception.AuthFailException;
 import com.likelion.server.domain.report.exception.ReportNotFoundByIdException;
 import com.likelion.server.domain.report.exception.ReportNotFoundException;
+import com.likelion.server.domain.report.generator.NewsGenerator;
 import com.likelion.server.domain.report.generator.ReportGenerator;
 import com.likelion.server.domain.report.repository.NewsRepository;
 import com.likelion.server.domain.report.repository.RecommendedStartupSupportRepository;
@@ -38,6 +39,7 @@ public class ReportServiceImpl implements ReportService {
     private final IdeaInfoAssembler ideaInfoAssembler;
     private final IdeaDescriptionFormatter ideaDescriptionFormatter;
     private final ReportGenerator reportGenerator;
+    private final NewsGenerator newsGenerator;
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
@@ -48,15 +50,15 @@ public class ReportServiceImpl implements ReportService {
 
         // 생성에 필요한 Idea 데이터 가공
         IdeaFullInfoDto info = ideaInfoAssembler.toFullInfo(idea);
-        String ideaData = ideaDescriptionFormatter.toDescription(info);
+        String ideaText = ideaDescriptionFormatter.toDescription(info);
 
-        Report report = reportGenerator.generate(idea, ideaData); // 레포트 생성
+        Report report = reportGenerator.generate(idea, ideaText); // 레포트 생성
         Report saved = reportRepository.save(report);
 
         // 뉴스 생성
+        newsGenerator.generate(report, ideaText);
 
-        // 지원사업 생성
-
+        // TODO: 지원사업 생성
 
         return new ReportCreateResponse(saved.getId());
     }

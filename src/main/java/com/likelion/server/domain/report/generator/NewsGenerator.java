@@ -1,7 +1,7 @@
 package com.likelion.server.domain.report.generator;
 
-import com.likelion.server.domain.idea.entity.Idea;
+import com.likelion.server.domain.report.entity.Report;
 
 public interface NewsGenerator {
-    void generate(Idea idea, Long reportId);
+    void generate(Report report, String ideaText);
 }
