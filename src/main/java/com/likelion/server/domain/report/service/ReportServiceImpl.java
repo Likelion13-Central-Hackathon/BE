@@ -1,6 +1,7 @@
 package com.likelion.server.domain.report.service;
 
 import com.likelion.server.domain.idea.entity.Idea;
+import com.likelion.server.domain.idea.entity.Need;
 import com.likelion.server.domain.idea.exception.IdeaNotFoundException;
 import com.likelion.server.domain.idea.repository.IdeaRepository;
 import com.likelion.server.domain.report.entity.Report;
@@ -16,6 +17,7 @@ import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
 import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.domain.user.repository.UserRepository;
 import com.likelion.server.global.response.SuccessResponse;
+import com.likelion.server.infra.gpt.GptChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,7 @@ public class ReportServiceImpl implements ReportService {
     private final ReportRepository reportRepository;
     private final NewsRepository newsRepository;
     private final RecommendedStartupSupportRepository recommendedStartupSupportRepository;
+    private final GptChatService gptChatService;
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
@@ -42,11 +45,15 @@ public class ReportServiceImpl implements ReportService {
         Idea idea = ideaRepository.findById(ideaId)
                 .orElseThrow(IdeaNotFoundException::new);
 
-        // 레포트 생성
+        // 1. 레포트 생성
         Report report = generateReportForIdea(idea);
         Report savedReport = reportRepository.save(report);
 
-        // 반환
+        // 2. 관련 메일 생성
+
+        // 3. 추천 정부지원사업 생성
+
+        // 4. 반환
         return new ReportCreateResponse(savedReport.getId());
     }
 
@@ -123,7 +130,30 @@ public class ReportServiceImpl implements ReportService {
 
     // 레포트 생성 메서드
     private Report generateReportForIdea(Idea idea) {
-        return null; // TODO
+
+        // idea 관련 정보 정리
+
+        // 1. 분석 각도, 추천 리서치 방법 산출
+
+        // 2. SWOT 분석
+
+        // 3. 추천 계획 및 이로인한 기대효과
+
+        return Report.builder()
+                .id(idea.getId())
+                .angle(angle) // 분석 각도
+                .researchMethod(researchMethod) // 추천 리서치 방법
+                .strength(strength) // SWOT
+                .weakness(weakness)
+                .opportunity(opportunity)
+                .threat(threat)
+                .step1(step1) // 추천계획
+                .step2(step2)
+                .step3(step3)
+                .step4(step4)
+                .expectedEffect(expectedEffect) // 기대효과
+                .build();
     }
+
 }
 
