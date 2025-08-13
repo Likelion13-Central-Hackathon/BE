@@ -2,8 +2,11 @@ package com.likelion.server.domain.report.service;
 
 import com.likelion.server.domain.idea.entity.Idea;
 import com.likelion.server.domain.idea.entity.Need;
+import com.likelion.server.domain.idea.entity.Resource;
 import com.likelion.server.domain.idea.exception.IdeaNotFoundException;
 import com.likelion.server.domain.idea.repository.IdeaRepository;
+import com.likelion.server.domain.idea.repository.NeedRepository;
+import com.likelion.server.domain.idea.repository.ResourceRepository;
 import com.likelion.server.domain.report.entity.Report;
 import com.likelion.server.domain.report.exception.AuthFailException;
 import com.likelion.server.domain.report.exception.ReportNotFoundByIdException;
@@ -11,6 +14,7 @@ import com.likelion.server.domain.report.exception.ReportNotFoundException;
 import com.likelion.server.domain.report.repository.NewsRepository;
 import com.likelion.server.domain.report.repository.RecommendedStartupSupportRepository;
 import com.likelion.server.domain.report.repository.ReportRepository;
+import com.likelion.server.domain.report.web.dto.IdeaFullInfoDto;
 import com.likelion.server.domain.report.web.dto.LatestReportDetailRequest;
 import com.likelion.server.domain.report.web.dto.ReportCreateResponse;
 import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
@@ -35,6 +39,8 @@ public class ReportServiceImpl implements ReportService {
     private final NewsRepository newsRepository;
     private final RecommendedStartupSupportRepository recommendedStartupSupportRepository;
     private final GptChatService gptChatService;
+    private final NeedRepository needRepository;
+    private final ResourceRepository resourceRepository;
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
@@ -130,15 +136,18 @@ public class ReportServiceImpl implements ReportService {
 
     // 레포트 생성 메서드
     private Report generateReportForIdea(Idea idea) {
+        // 1. 데이터 가공
+        IdeaFullInfoDto ideaFullInfoDto = buildIdeaFullInfoDto(idea); // report 생성에 필요한 데이터 취합
+        String ideaData = buildIdeaFullDescription(ideaFullInfoDto); // 문자열로 변환
 
-        // idea 관련 정보 정리
+        // 2. 데이터 취득
+            // 1) 분석 각도, 추천 리서치 방법 산출
 
-        // 1. 분석 각도, 추천 리서치 방법 산출
+            // 2) SWOT 분석
 
-        // 2. SWOT 분석
+            // 3) 추천 계획 및 이로인한 기대효과
 
-        // 3. 추천 계획 및 이로인한 기대효과
-
+        // 3. 반환
         return Report.builder()
                 .id(idea.getId())
                 .angle(angle) // 분석 각도
@@ -153,6 +162,88 @@ public class ReportServiceImpl implements ReportService {
                 .step4(step4)
                 .expectedEffect(expectedEffect) // 기대효과
                 .build();
+    }
+
+    // 아이디어와 관련된 모든 데이터를 DTO로 변환
+    private IdeaFullInfoDto buildIdeaFullInfoDto(Idea idea) {
+        // 연관 데이터 조회
+        List<Need> needs = needRepository.findByIdeaId(idea.getId());
+        List<Resource> resources = resourceRepository.findByIdeaId(idea.getId());
+
+        User user = idea.getUser();
+
+        return new IdeaFullInfoDto(
+                user.getAge(),
+                user.isEnrolled(),
+                user.isEnrolled() ? user.getUniversity() : null,
+                user.isEnrolled() ? user.getAcademicStatus() : null,
+                idea.getAddressCity(),
+                idea.getAddressDistrict(),
+                idea.getInterestArea(),
+                idea.getBusinessAge(),
+                idea.getStage(),
+                idea.getDescription(),
+                idea.getTeamSize(),
+                idea.getCapital(),
+                idea.isReceiveNotification(),
+                idea.getCreatedAt(),
+                idea.getUpdatedAt(),
+                needs.stream()
+                        .map(n -> new IdeaFullInfoDto.NeedInfo(n.getLabel(), n.getLevel()))
+                        .toList(),
+                resources.stream()
+                        .map(r -> new IdeaFullInfoDto.ResourceInfo(r.getLabel(), r.getLevel()))
+                        .toList()
+        );
+    }
+
+    // IdeaFullInfoDto를 텍스트로 변환
+    private String buildIdeaFullDescription(IdeaFullInfoDto dto) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("작성자 나이: ").append(dto.userAge()).append("\n");
+        sb.append("재학 여부: ").append(dto.isEnrolled() ? "예" : "아니오").append("\n");
+
+        // 재학중일 경우에만 존재하는 값들
+        if (dto.isEnrolled()) {
+            sb.append("대학교: ").append(nullSafe(dto.university())).append("\n");
+            sb.append("학적 상태: ").append(enumSafe(dto.academicStatus())).append("\n");
+        }
+
+        sb.append("사업장 주소(시/도): ").append(nullSafe(dto.addressCity())).append("\n");
+        sb.append("사업장 주소(시/군/구): ").append(nullSafe(dto.addressDistrict())).append("\n");
+        sb.append("관심 분야: ").append(nullSafe(dto.interestArea())).append("\n");
+        sb.append("업력: ").append(enumSafe(dto.businessAge())).append("\n");
+        sb.append("현재 창업 단계: ").append(enumSafe(dto.stage())).append("\n");
+        sb.append("아이템 설명: ").append(nullSafe(dto.description())).append("\n");
+        sb.append("팀 구성원 수: ").append(enumSafe(dto.teamSize())).append("\n");
+        sb.append("보유 자본(만원): ").append(enumSafe(dto.capital())).append("\n");
+
+        if (!dto.needs().isEmpty()) {
+            sb.append("필요 지원 항목:\n");
+            dto.needs().forEach(n ->
+                    sb.append("- 항목명: ").append(enumSafe(n.label()))
+                            .append(", 레벨(필요도): ").append(enumSafe(n.level())).append("\n")
+            );
+        }
+
+        if (!dto.resources().isEmpty()) {
+            sb.append("보유 자원:\n");
+            dto.resources().forEach(r ->
+                    sb.append("- 항목명: ").append(enumSafe(r.label()))
+                            .append(", 레벨(필요도): ").append(enumSafe(r.level())).append("\n")
+            );
+        }
+
+        return sb.toString();
+    }
+
+    // null 일 경우 "없음" 반환
+    private String nullSafe(String value) {
+        return value != null ? value : "없음";
+    }
+    private String enumSafe(Enum<?> value) {
+        return value != null ? value.name() : "없음";
     }
 
 }
