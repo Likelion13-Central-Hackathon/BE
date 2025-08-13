@@ -34,6 +34,7 @@ public class PplxClient {
         this.searchContextSize = searchContextSize;
     }
 
+    // 뉴스 찾기
     public String searchNews(String keyword) {
         Map<String, Object> body = Map.of(
                 "model", model,
