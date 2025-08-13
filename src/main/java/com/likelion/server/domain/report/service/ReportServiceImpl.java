@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -134,34 +135,16 @@ public class ReportServiceImpl implements ReportService {
         return (d == null) ? null : d.format(DATE);
     }
 
-    // 레포트 생성 메서드
-    private Report generateReportForIdea(Idea idea) {
-        // 1. 데이터 가공
-        IdeaFullInfoDto ideaFullInfoDto = buildIdeaFullInfoDto(idea); // report 생성에 필요한 데이터 취합
-        String ideaData = buildIdeaFullDescription(ideaFullInfoDto); // 문자열로 변환
 
-        // 2. 데이터 취득
-            // 1) 분석 각도, 추천 리서치 방법 산출
-
-            // 2) SWOT 분석
-
-            // 3) 추천 계획 및 이로인한 기대효과
-
-        // 3. 반환
-        return Report.builder()
-                .id(idea.getId())
-                .angle(angle) // 분석 각도
-                .researchMethod(researchMethod) // 추천 리서치 방법
-                .strength(strength) // SWOT
-                .weakness(weakness)
-                .opportunity(opportunity)
-                .threat(threat)
-                .step1(step1) // 추천계획
-                .step2(step2)
-                .step3(step3)
-                .step4(step4)
-                .expectedEffect(expectedEffect) // 기대효과
-                .build();
+    /**
+     * 지정된 키워드로 시작하는 라인의 값을 반환
+     */
+    private String parseLine(String text, String key) {
+        return Arrays.stream(text.split("\\r?\\n"))
+                .filter(line -> line.startsWith(key + ":"))
+                .map(line -> line.replace(key + ":", "").trim())
+                .findFirst()
+                .orElse(null);
     }
 
     // 아이디어와 관련된 모든 데이터를 DTO로 변환
