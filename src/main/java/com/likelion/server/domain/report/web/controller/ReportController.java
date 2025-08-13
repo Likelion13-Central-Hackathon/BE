@@ -20,7 +20,7 @@ public class ReportController {
     // 레포트 생성
     @PostMapping("/ideas/{ideaId}/reports")
     public SuccessResponse<ReportCreateResponse> createReport(
-            @RequestParam("ideaId") Long ideaId
+            @PathVariable("ideaId") Long ideaId
     ) {
         ReportCreateResponse data = reportService.createReport(ideaId);
         return SuccessResponse.created(data);

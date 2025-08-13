@@ -15,6 +15,7 @@ import com.likelion.server.domain.report.web.dto.ReportCreateResponse;
 import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
 import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.domain.user.repository.UserRepository;
+import com.likelion.server.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,12 @@ public class ReportServiceImpl implements ReportService {
         Idea idea = ideaRepository.findById(ideaId)
                 .orElseThrow(IdeaNotFoundException::new);
 
-        return null;
+        // 레포트 생성
+        Report report = generateReportForIdea(idea);
+        Report savedReport = reportRepository.save(report);
+
+        // 반환
+        return new ReportCreateResponse(savedReport.getId());
     }
 
     @Override
@@ -66,6 +72,8 @@ public class ReportServiceImpl implements ReportService {
 
         return toResponse(report);
     }
+
+    // === === === 활용 메서드 === === ===
 
     private ReportDetailResponse toResponse(Report report) {
         // steps 배열 생성
@@ -111,6 +119,11 @@ public class ReportServiceImpl implements ReportService {
 
     private String formatOrNull(LocalDate d) {
         return (d == null) ? null : d.format(DATE);
+    }
+
+    // 레포트 생성 메서드
+    private Report generateReportForIdea(Idea idea) {
+        return null; // TODO
     }
 }
 
