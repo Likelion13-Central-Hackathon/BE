@@ -4,5 +4,5 @@ import com.likelion.server.domain.idea.entity.Idea;
 import com.likelion.server.domain.report.entity.Report;
 
 public interface ReportGenerator {
-    Report generate(Idea idea);
+    Report generate(Idea idea,  String ideaData);
 }

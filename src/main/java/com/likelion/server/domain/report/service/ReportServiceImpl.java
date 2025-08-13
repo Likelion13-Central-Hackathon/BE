@@ -3,6 +3,9 @@ package com.likelion.server.domain.report.service;
 import com.likelion.server.domain.idea.entity.Idea;
 import com.likelion.server.domain.idea.exception.IdeaNotFoundException;
 import com.likelion.server.domain.idea.repository.IdeaRepository;
+import com.likelion.server.domain.idea.support.IdeaDescriptionFormatter;
+import com.likelion.server.domain.idea.support.IdeaInfoAssembler;
+import com.likelion.server.domain.idea.web.dto.IdeaFullInfoDto;
 import com.likelion.server.domain.report.entity.Report;
 import com.likelion.server.domain.report.exception.AuthFailException;
 import com.likelion.server.domain.report.exception.ReportNotFoundByIdException;
@@ -11,7 +14,6 @@ import com.likelion.server.domain.report.generator.ReportGenerator;
 import com.likelion.server.domain.report.repository.NewsRepository;
 import com.likelion.server.domain.report.repository.RecommendedStartupSupportRepository;
 import com.likelion.server.domain.report.repository.ReportRepository;
-import com.likelion.server.domain.report.web.dto.IdeaFullInfoDto;
 import com.likelion.server.domain.report.web.dto.LatestReportDetailRequest;
 import com.likelion.server.domain.report.web.dto.ReportCreateResponse;
 import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
@@ -33,6 +35,8 @@ public class ReportServiceImpl implements ReportService {
     private final ReportRepository reportRepository;
     private final NewsRepository newsRepository;
     private final RecommendedStartupSupportRepository recommendedStartupSupportRepository;
+    private final IdeaInfoAssembler ideaInfoAssembler;
+    private final IdeaDescriptionFormatter ideaDescriptionFormatter;
     private final ReportGenerator reportGenerator;
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy.MM.dd");
@@ -42,10 +46,17 @@ public class ReportServiceImpl implements ReportService {
         Idea idea = ideaRepository.findById(ideaId)
                 .orElseThrow(IdeaNotFoundException::new);
 
-        Report report = reportGenerator.generate(idea); // 레포트 생성
+        // 생성에 필요한 Idea 데이터 가공
+        IdeaFullInfoDto info = ideaInfoAssembler.toFullInfo(idea);
+        String ideaData = ideaDescriptionFormatter.toDescription(info);
+
+        Report report = reportGenerator.generate(idea, ideaData); // 레포트 생성
         Report saved = reportRepository.save(report);
 
-        // TODO: 메일/추천 지원사업 생성
+        // 뉴스 생성
+
+        // 지원사업 생성
+
 
         return new ReportCreateResponse(saved.getId());
     }

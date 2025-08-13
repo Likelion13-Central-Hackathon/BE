@@ -1,4 +1,4 @@
-package com.likelion.server.domain.report.web.dto;
+package com.likelion.server.domain.idea.web.dto;
 
 import com.likelion.server.domain.idea.entity.enums.*;
 import com.likelion.server.domain.user.entity.enums.AcademicStatus;
