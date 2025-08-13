@@ -1,7 +1,7 @@
 package com.likelion.server.domain.report.web.controller;
 
 
-import com.likelion.server.domain.report.service.ReportQueryService;
+import com.likelion.server.domain.report.service.ReportService;
 import com.likelion.server.domain.report.web.dto.LatestReportDetailRequest;
 import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
 import com.likelion.server.global.response.SuccessResponse;
@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reports")
-public class ReportQueryController {
+public class ReportController {
 
-    private final ReportQueryService reportQueryService;
+    private final ReportService reportQueryService;
+
+    // 레포트 생성
+    @PostMapping()
 
     // 최근 리포트 상세 조회
     @GetMapping("/latest")

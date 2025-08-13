@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ReportQueryServiceImpl implements ReportQueryService {
+public class ReportServiceImpl implements ReportService {
 
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
