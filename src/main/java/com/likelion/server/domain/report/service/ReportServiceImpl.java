@@ -1,5 +1,8 @@
 package com.likelion.server.domain.report.service;
 
+import com.likelion.server.domain.idea.entity.Idea;
+import com.likelion.server.domain.idea.exception.IdeaNotFoundException;
+import com.likelion.server.domain.idea.repository.IdeaRepository;
 import com.likelion.server.domain.report.entity.Report;
 import com.likelion.server.domain.report.exception.AuthFailException;
 import com.likelion.server.domain.report.exception.ReportNotFoundByIdException;
@@ -8,6 +11,7 @@ import com.likelion.server.domain.report.repository.NewsRepository;
 import com.likelion.server.domain.report.repository.RecommendedStartupSupportRepository;
 import com.likelion.server.domain.report.repository.ReportRepository;
 import com.likelion.server.domain.report.web.dto.LatestReportDetailRequest;
+import com.likelion.server.domain.report.web.dto.ReportCreateResponse;
 import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
 import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.domain.user.repository.UserRepository;
@@ -22,12 +26,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
 
+    private final IdeaRepository ideaRepository;
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
     private final NewsRepository newsRepository;
     private final RecommendedStartupSupportRepository recommendedStartupSupportRepository;
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
+    // 레포트 생성
+    @Override
+    public ReportCreateResponse createReport(Long ideaId) {
+        // 404: 아이디어 없음
+        Idea idea = ideaRepository.findById(ideaId)
+                .orElseThrow(IdeaNotFoundException::new);
+
+        return null;
+    }
 
     @Override
     public ReportDetailResponse getLatestReport(LatestReportDetailRequest request) {

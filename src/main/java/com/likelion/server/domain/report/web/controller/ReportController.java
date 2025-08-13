@@ -22,7 +22,8 @@ public class ReportController {
     public SuccessResponse<ReportCreateResponse> createReport(
             @RequestParam("ideaId") Long ideaId
     ) {
-        return null;
+        ReportCreateResponse data = reportService.createReport(ideaId);
+        return SuccessResponse.created(data);
     }
 
 
