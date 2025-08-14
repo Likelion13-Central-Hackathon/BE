@@ -25,6 +25,9 @@ jobs:
       OPENAI_TIMEOUT: ${{ secrets.OPENAI_TIMEOUT }}
       # PPLX
       PPLX_KEY: ${{ secrets.PPLX_KEY }}
+      # MAIL
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
 
     steps:
       # GitHub 저장소 코드 체크아웃
