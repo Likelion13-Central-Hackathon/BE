@@ -26,9 +26,11 @@ public class StartupSupport extends BaseEntity {
     private String supportArea;
 
     // 지역
+    @Enumerated(EnumType.STRING)
     private String region;
 
     // 업력 대상
+    @Enumerated(EnumType.STRING)
     private BusinessDuration businessDuration;
 
     // 주관기관명
