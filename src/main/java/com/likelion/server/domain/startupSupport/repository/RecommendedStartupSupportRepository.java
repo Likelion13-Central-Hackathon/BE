@@ -1,6 +1,6 @@
-package com.likelion.server.domain.report.repository;
+package com.likelion.server.domain.startupSupport.repository;
 
-import com.likelion.server.domain.report.entity.RecommendedStartupSupport;
+import com.likelion.server.domain.startupSupport.entity.RecommendedStartupSupport;
 import com.likelion.server.domain.report.entity.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 

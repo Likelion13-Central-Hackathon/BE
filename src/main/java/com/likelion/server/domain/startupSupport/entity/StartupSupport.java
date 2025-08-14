@@ -1,4 +1,4 @@
-package com.likelion.server.domain.report.entity;
+package com.likelion.server.domain.startupSupport.entity;
 
 import com.likelion.server.global.entity.BaseEntity;
 import jakarta.persistence.*;
