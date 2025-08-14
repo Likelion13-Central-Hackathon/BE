@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likelion.server.domain.answer.entity.Answer;
 import com.likelion.server.domain.answer.entity.Question;
+import com.likelion.server.domain.answer.exception.AnswersNotFoundException;
 import com.likelion.server.domain.answer.repository.AnswerRepository;
 import com.likelion.server.domain.answer.repository.QuestionRepository;
 import com.likelion.server.domain.answer.web.dto.QaResponse;
+import com.likelion.server.domain.idea.entity.Idea;
+import com.likelion.server.domain.idea.exception.IdeaNotFoundException;
 import com.likelion.server.infra.gpt.GptChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,12 +30,9 @@ public class QaServiceImpl implements QaService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public Map<String, Object> generateByAnswerId(Long answerId) {
-        Optional<Answer> opt = answerRepository.findById(answerId);
-        if (opt.isEmpty()) {
-            return error("ANSWERS_404_NOT_FOUND", 404, "해당 ID에 해당하는 답변을 찾을 수 없습니다.");
-        }
-        Answer answer = opt.get();
+    public List<QaResponse> generateByAnswerId(Long answerId) {
+        Answer answer = answerRepository.findById(answerId)
+                .orElseThrow(AnswersNotFoundException::new);
 
         // 1) 프롬프트 구성
         String prompt = buildPrompt();
@@ -77,15 +77,7 @@ public class QaServiceImpl implements QaService {
         }
         questionRepository.saveAll(entities);
 
-        // 5) 성공 응답
-        Map<String, Object> res = new HashMap<>();
-        res.put("isSuccess", true);
-        res.put("code", "SUCCESS_200");
-        res.put("httpStatus", 200);
-        res.put("message", "호출에 성공하였습니다.");
-        res.put("data", items); // [ {question, answer}, ... ]
-        res.put("timeStamp", now());
-        return res;
+        return items;
     }
 
     private String buildPrompt() {
@@ -117,21 +109,6 @@ public class QaServiceImpl implements QaService {
 
     private static String safe(String s) {
         return Optional.ofNullable(s).orElse("");
-    }
-
-    private static String now() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    }
-
-    private static Map<String, Object> error(String code, int status, String message) {
-        Map<String, Object> res = new HashMap<>();
-        res.put("isSuccess", false);
-        res.put("code", code);
-        res.put("httpStatus", status);
-        res.put("message", message);
-        res.put("data", null);
-        res.put("timeStamp", now());
-        return res;
     }
 
     private static List<QaResponse> fallbackToSingle(String raw) {

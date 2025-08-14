@@ -4,12 +4,14 @@ import com.likelion.server.domain.answer.service.QaService;
 import com.likelion.server.domain.answer.service.AnswerService;
 import com.likelion.server.domain.answer.web.dto.AnswerRequest;
 import com.likelion.server.domain.answer.web.dto.AnswerResponse;
+import com.likelion.server.domain.answer.web.dto.QaResponse;
 import com.likelion.server.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -29,9 +31,8 @@ public class AnswerController {
     }
 
     @PostMapping("/{answerId}/questions")
-    public ResponseEntity<Map<String, Object>> generateQAs(@PathVariable Long answerId) {
-        return ResponseEntity.ok(
-                qaService.generateByAnswerId(answerId)
-        );
+    public SuccessResponse<List<QaResponse>> generateQAs(@PathVariable Long answerId) {
+        List<QaResponse> data = qaService.generateByAnswerId(answerId);
+        return SuccessResponse.ok(data);
     }
 }
