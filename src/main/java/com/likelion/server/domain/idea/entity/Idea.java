@@ -62,4 +62,9 @@ public class Idea extends BaseEntity {
                 .receiveNotification(false)
                 .build();
     }
+
+    public void EnableNotification(User user) {
+        this.user = user;
+        this.receiveNotification = true;
+    }
 }
