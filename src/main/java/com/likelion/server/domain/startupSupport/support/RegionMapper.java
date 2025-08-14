@@ -19,6 +19,16 @@ public final class RegionMapper {
             // 더 추가될 예정임
     );
 
+    private static final Map<Region, String> ENUM_TO_KOR = Map.of(
+            Region.NATIONAL, "전국",
+            Region.SEOUL, "서울",
+            Region.GYEONGGI, "경기",
+            Region.DAEGU, "대구",
+            Region.CHUNGNAM, "충남"
+            // 마찬가지로 더 추가될 예정
+    );
+
+    // Request -> DB 조회를 위해
     public static Region toEnum(String value) {
         if (value == null || value.isBlank()) {
             throw new RegionRequiredException(); // region는 필수
@@ -30,4 +40,8 @@ public final class RegionMapper {
         throw new InvalidRegionException(); // 지원하지 않는 region 값 예외
     }
 
+    // DB 조회 이후 -> Response 위해
+    public static String toKorean(Region region) {
+        return ENUM_TO_KOR.getOrDefault(region, region.name());
+    }
 }
