@@ -14,4 +14,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     // Report ID로 리포트 조회
     Optional<Report> findById(Long reportId);
+
+    // 특정 아이디어의 최신 리포트 한 건 조회
+    Optional<Report> findTopByIdeaIdOrderByCreatedAtDesc(Long ideaId);
 }
