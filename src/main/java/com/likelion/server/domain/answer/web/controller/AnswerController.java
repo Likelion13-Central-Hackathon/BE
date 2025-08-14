@@ -1,5 +1,6 @@
 package com.likelion.server.domain.answer.web.controller;
 
+import com.likelion.server.domain.answer.service.QaService;
 import com.likelion.server.domain.answer.service.AnswerService;
 import com.likelion.server.domain.answer.web.dto.AnswerRequest;
 import com.likelion.server.domain.answer.web.dto.AnswerResponse;
@@ -9,12 +10,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/answers")
 public class AnswerController {
 
     private final AnswerService answerService;
+    private final QaService qaService;
 
     @PostMapping
     public ResponseEntity<SuccessResponse<AnswerResponse>> create(@Valid @RequestBody AnswerRequest req) {
@@ -22,5 +26,12 @@ public class AnswerController {
         var data = new AnswerResponse(result.aiAnswer(), result.answerId());
 
         return ResponseEntity.ok(SuccessResponse.ok(data));
+    }
+
+    @PostMapping("/{answerId}/questions")
+    public ResponseEntity<Map<String, Object>> generateQAs(@PathVariable Long answerId) {
+        return ResponseEntity.ok(
+                qaService.generateByAnswerId(answerId)
+        );
     }
 }
