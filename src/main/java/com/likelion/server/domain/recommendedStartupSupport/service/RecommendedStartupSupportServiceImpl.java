@@ -4,6 +4,7 @@ import com.likelion.server.domain.recommendedStartupSupport.entity.RecommendedSt
 import com.likelion.server.domain.recommendedStartupSupport.exception.RecommendedStartupSupportNotFoundException;
 import com.likelion.server.domain.recommendedStartupSupport.repository.RecommendedStartupSupportRepository;
 import com.likelion.server.domain.recommendedStartupSupport.web.dto.RecommendedStartupSupportDetailResponse;
+import com.likelion.server.domain.startupSupport.entity.StartupSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,10 @@ public class RecommendedStartupSupportServiceImpl implements RecommendedStartupS
         // 404: 추천 창업 지원 사업 찾을 수 없음
         RecommendedStartupSupport recommendedStartupSupport = recommendedStartupSupportRepository.findByIdWithSupport(recommendedStartupSupportId)
                 .orElseThrow(RecommendedStartupSupportNotFoundException::new);
+        StartupSupport startupSupport = recommendedStartupSupport.getStartupSupport();
 
         return RecommendedStartupSupportDetailResponse.of(
-                recommendedStartupSupport.getStartupSupport(),
+                startupSupport,
                 recommendedStartupSupport);
     }
-
 }

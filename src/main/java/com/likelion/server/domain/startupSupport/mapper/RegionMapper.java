@@ -43,7 +43,7 @@ public final class RegionMapper {
     }
 
     // String -> Enum
-    public static String toKorean(Region region) {
+    public static String toString(Region region) {
         return ENUM_TO_KOR.getOrDefault(region, region.name());
     }
 }

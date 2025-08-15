@@ -52,12 +52,12 @@ public final class BusinessDurationMapper {
 
     // String -> Enum
     public static BusinessDuration toEnum(String value) {
-        BusinessDuration d = KOR_TO_ENUM.get(value.trim());
-        if (d != null) return d;
+        if (value == null) return null;
+        return KOR_TO_ENUM.get(value.trim());
     }
 
     //  Enum → String
-    public static String toKorean(BusinessDuration duration) {
+    public static String toString(BusinessDuration duration) {
         if (duration == null) return null;
         return ENUM_TO_KOR.getOrDefault(duration, duration.name());
     }

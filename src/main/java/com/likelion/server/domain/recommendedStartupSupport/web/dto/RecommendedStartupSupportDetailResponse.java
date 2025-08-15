@@ -2,6 +2,8 @@ package com.likelion.server.domain.recommendedStartupSupport.web.dto;
 
 import com.likelion.server.domain.recommendedStartupSupport.entity.RecommendedStartupSupport;
 import com.likelion.server.domain.startupSupport.entity.StartupSupport;
+import com.likelion.server.domain.startupSupport.entity.enums.BusinessDuration;
+import com.likelion.server.domain.startupSupport.mapper.BusinessDurationMapper;
 import com.likelion.server.domain.startupSupport.mapper.RegionMapper;
 
 public record RecommendedStartupSupportDetailResponse(
@@ -30,16 +32,16 @@ public record RecommendedStartupSupportDetailResponse(
                 s.getLink(),
                 s.formatYmd(s.getStartDate()),
                 s.formatYmd(s.getEndDate()),
-                RegionMapper.toKorean(s.getRegion()), // 지역
-                s.getBusinessDuration().toString(), // 업력
+                RegionMapper.toString(s.getRegion()), // 지역
+                BusinessDurationMapper.toString(s.getBusinessDuration()), // 업력
                 s.getAgency(),
+                s.getTargetAge(),
                 s.getTarget(),
                 s.getContact(),// 연락처
-                s.getApplyMethod(), // 신청방법
-                s.getSupportDetails(), // 지원 내용
+                s.getApplyMethod(), // 신청 방법
+                s.getBudget(), // 지원 내용 -> 우선은 규모로
                 s.getRequiredDocuments(), // 제출 서류
-                s.getApplyProcedure(),
-                s.getEvaluationMethod(),
+                s.getEvaluationMethod(), // 신청방법 및 평가 방법
                 r.getSuitability(), // 적합도
                 r.getReason() // 추천한 이유
         );

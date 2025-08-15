@@ -45,7 +45,7 @@ public class StartupSupportServiceImpl implements StartupSupportService{
         return pageData.map(startupSupport -> new StartupSupportSummaryResponse(
                 startupSupport.getId(),
                 startupSupport.getSupportArea(),
-                RegionMapper.toKorean(startupSupport.getRegion()),
+                RegionMapper.toString(startupSupport.getRegion()),
                 startupSupport.getTitle(),
                 startupSupport.getLink()
         )) .getContent();
