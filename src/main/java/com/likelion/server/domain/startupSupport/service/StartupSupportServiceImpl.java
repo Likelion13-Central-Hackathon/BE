@@ -4,6 +4,7 @@ import com.likelion.server.domain.startupSupport.entity.StartupSupport;
 import com.likelion.server.domain.startupSupport.entity.enums.Region;
 import com.likelion.server.domain.startupSupport.repository.StartupSupportRepository;
 import com.likelion.server.domain.startupSupport.support.RegionMapper;
+import com.likelion.server.domain.startupSupport.web.dto.StartupSupportDetailResponse;
 import com.likelion.server.domain.startupSupport.web.dto.StartupSupportSummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -49,5 +50,11 @@ public class StartupSupportServiceImpl implements StartupSupportService{
                 startupSupport.getTitle(),
                 startupSupport.getLink()
         )) .getContent();
+    }
+
+    // 창업 지원 사업 상세 조회
+    @Override
+    public StartupSupportDetailResponse getDetailSupports(Long supportId) {
+        return null;
     }
 }
