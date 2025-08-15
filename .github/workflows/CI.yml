@@ -88,7 +88,8 @@ jobs:
   docker-push:
     name: Docker Build & Push
     # PR이 아닐 때만 + main 브랜치만 푸시
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     needs: build
     runs-on: ubuntu-latest
     steps:
