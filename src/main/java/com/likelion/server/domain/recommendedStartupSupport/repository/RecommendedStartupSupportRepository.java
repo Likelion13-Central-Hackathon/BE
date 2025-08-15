@@ -18,4 +18,6 @@ public interface RecommendedStartupSupportRepository extends JpaRepository<Recom
         where rss.id = :id
     """)
     Optional<RecommendedStartupSupport> findByIdWithSupport(@org.springframework.data.repository.query.Param("id") Long id);
+
+    List<RecommendedStartupSupport> findTop3ByReportIdOrderBySuitabilityDesc(Long reportId);
 }

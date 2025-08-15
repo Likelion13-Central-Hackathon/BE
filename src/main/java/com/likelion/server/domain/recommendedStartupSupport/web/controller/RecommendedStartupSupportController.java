@@ -19,7 +19,7 @@ public class RecommendedStartupSupportController {
     public SuccessResponse<RecommendedStartupSupportDetailResponse> getById(
             @PathVariable("recommendedId") Long recommendedId
     ){
-        RecommendedStartupSupportDetailResponse data = recommendedStartupSupportService.getDetailSupports(recommendedId);
+        RecommendedStartupSupportDetailResponse data = recommendedStartupSupportService.getById(recommendedId);
         return SuccessResponse.ok(data);
     }
 }
