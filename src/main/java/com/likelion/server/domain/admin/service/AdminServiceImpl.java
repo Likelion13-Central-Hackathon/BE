@@ -1,5 +1,6 @@
 package com.likelion.server.domain.admin.service;
 
+import com.likelion.server.domain.admin.web.dto.StartupSupportResponse;
 import com.likelion.server.domain.admin.web.dto.StartupSupportSyncRequest;
 import com.likelion.server.domain.admin.web.dto.StartupSupportSyncResponse;
 import com.likelion.server.domain.startupSupport.entity.StartupSupport;
@@ -10,14 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,8 @@ public class AdminServiceImpl implements AdminService{
     // 최신 창업 지원사업 데이터를 수집 및 동기화
     @Override
     @Transactional
-    public void syncLatestStartupSupports() {
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    public List<StartupSupportResponse> syncLatestStartupSupports() {
         String syncUrl = apiBaseUrl + "/api/startup-supports";
 
         // 1. 가장 최근 startupSupport의 externalRef (없으면 null)
@@ -68,7 +69,7 @@ public class AdminServiceImpl implements AdminService{
         List<StartupSupportSyncResponse> incoming = response.getBody();
         if (incoming == null || incoming.isEmpty()) {
             log.info("[SYNC] 신규 데이터 없음 (cursor={})", cursor);
-            return; // 신규 없음
+            return null; // 신규 없음
         }
 
         // 4. 저장
@@ -119,12 +120,14 @@ public class AdminServiceImpl implements AdminService{
                 log.warn("[SYNC] 변환/검증 스킵 externalRef={}, reason={}", d.externalRef(), ex.toString());
             }
         }
+        List<StartupSupport> saved = supportRepository.saveAll(batch);
 
-        if (!batch.isEmpty()) {
-            supportRepository.saveAll(batch);
-        }
         log.info("[SYNC] 저장 완료 - 신규 저장:{}건, 변환스킵:{}건, 중복스킵(extRef):{}건, 중복스킵(title):{}건",
                 success, skipped, skippedDupExt, skippedDupTitle);
+
+        return saved.stream()
+                .map(s -> new StartupSupportResponse(s.getId(), s.getTitle(), s.getExternalRef()))
+                .collect(Collectors.toList());
 
     }
 }
