@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping()
+@RequestMapping("/reports")
 public class ReportController {
 
     private final ReportService reportService;
 
     // 최근 리포트 상세 조회
-    @GetMapping("/reports/latest")
+    @GetMapping("/latest")
     public SuccessResponse<ReportDetailResponse> getLatestReport(
             @RequestBody @Valid LatestReportDetailRequest request
     ) {
@@ -26,7 +26,7 @@ public class ReportController {
     }
 
     // ID 기반 상세 조회
-    @GetMapping("/reports/{reportId}")
+    @GetMapping("/{reportId}")
     public SuccessResponse<ReportDetailResponse> getById(@PathVariable Long reportId) {
         return SuccessResponse.ok(reportService.getById(reportId));
     }
