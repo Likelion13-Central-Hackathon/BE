@@ -22,7 +22,7 @@ public class StartupSupportServiceImpl implements StartupSupportService{
 
     // 창업 지원 사업 목록 조회
     @Override
-    public Page<StartupSupportSummaryResponse> getPagedOpenSupports(String regionParam, int page, int num) {
+    public List<StartupSupportSummaryResponse> getPagedOpenSupports(String regionParam, int page, int num) {
         // 1) region 문자열 -> enum (DB 조회를 위해)
         Region requestRegion = RegionMapper.toEnum(regionParam);
 
@@ -48,6 +48,6 @@ public class StartupSupportServiceImpl implements StartupSupportService{
                 RegionMapper.toKorean(startupSupport.getRegion()),
                 startupSupport.getTitle(),
                 startupSupport.getLink()
-        ));
+        )) .getContent();
     }
 }
