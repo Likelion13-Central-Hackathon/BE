@@ -17,10 +17,22 @@ public class RecommendedStartupSupportServiceImpl implements RecommendedStartupS
     private final RecommendedStartupSupportRepository recommendedStartupSupportRepository;
     // 레포트 기반 추천 창업 지원 사업 목록 조회
     @Override
-    public RecommendedStartupSupportSummaryResponse getByReportId(Long reportId) {
+    public List<RecommendedStartupSupportSummaryResponse> getByReportId(Long reportId) {
         // DB 조회(상위 3개, 레포트 ID 기반, 적합도 기반 내림차순 정렬)
         List<RecommendedStartupSupport> supportList = recommendedStartupSupportRepository.findTop3ByReportIdOrderBySuitabilityDesc((reportId));
 
+        // 반환
+        return supportList.stream()
+                .map(s -> new RecommendedStartupSupportSummaryResponse(
+                        s.getId(),
+                        s.getSuitability(),
+                        s.getStartupSupport().getSupportArea(),
+                        s.getStartupSupport().getTitle(),
+                        s.getStartupSupport().getAgency(),
+                        s.formatYmd(s.getStartupSupport().getStartDate()),
+                        s.formatYmd(s.getStartupSupport().getEndDate())
+                ))
+                .toList();
     }
 
     // 추천 창업 지원 사업 상세 조회
