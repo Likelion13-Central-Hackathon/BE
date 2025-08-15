@@ -2,6 +2,7 @@ package com.likelion.server.domain.startupSupport.service;
 
 import com.likelion.server.domain.startupSupport.entity.StartupSupport;
 import com.likelion.server.domain.startupSupport.entity.enums.Region;
+import com.likelion.server.domain.startupSupport.exception.StartupSupportNotFoundException;
 import com.likelion.server.domain.startupSupport.repository.StartupSupportRepository;
 import com.likelion.server.domain.startupSupport.support.RegionMapper;
 import com.likelion.server.domain.startupSupport.web.dto.StartupSupportDetailResponse;
@@ -55,9 +56,25 @@ public class StartupSupportServiceImpl implements StartupSupportService{
     // 창업 지원 사업 상세 조회
     @Override
     public StartupSupportDetailResponse getDetailSupports(Long supportId) {
+        // 404: 창업 지원 사업 찾을 수 없음
         StartupSupport support = startupSupportRepository.findById(supportId)
-                .orElseThrow(new )
+                .orElseThrow(StartupSupportNotFoundException::new);
 
-        return null;
+        return new StartupSupportDetailResponse(
+                support.getSupportArea(),
+                support.getTitle(),
+                support.getLink(),
+                support.getStartDate(),
+                support.getEndDate(),
+                support.getRegion(),
+                support.getBusinessDuration(), //업력
+                support.getAgency(),
+                support.getTarget(),
+                support.getContact(),//연락처
+                support.getCoreContent() //핵심 본문 내용
+
+                //        int suitability, // 적합도
+                //        String reason // 추천한 이유
+        );
     }
 }

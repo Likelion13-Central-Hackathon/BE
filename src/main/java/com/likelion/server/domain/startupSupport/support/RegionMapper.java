@@ -6,7 +6,7 @@ import com.likelion.server.domain.startupSupport.exception.RegionRequiredExcepti
 
 import java.util.Map;
 
-// FE 요청은 한글, DB 저장은 영어 -> 매핑을 위한 클래스
+// FE 요청은 한글, DB 저장 및 Enum 값은 영어 -> 매핑을 위한 클래스
 public final class RegionMapper {
     private RegionMapper() {}
 
@@ -28,19 +28,21 @@ public final class RegionMapper {
             // 마찬가지로 더 추가될 예정
     );
 
-    // Request -> DB 조회를 위해
+    // Request -> DB 조회 (한->영)
     public static Region toEnum(String value) {
         if (value == null || value.isBlank()) {
-            throw new RegionRequiredException(); // region는 필수
+            // 400: region은 필수 메서드
+            throw new RegionRequiredException();
         }
         // 매핑
         Region r = KOR_TO_ENUM.get(value.trim());
         if (r != null) return r;
 
-        throw new InvalidRegionException(); // 지원하지 않는 region 값 예외
+        // 400: 지원하지 않는 region 값
+        throw new InvalidRegionException();
     }
 
-    // DB 조회 이후 -> Response 위해
+    // DB 조회 -> Response (영->한)
     public static String toKorean(Region region) {
         return ENUM_TO_KOR.getOrDefault(region, region.name());
     }
