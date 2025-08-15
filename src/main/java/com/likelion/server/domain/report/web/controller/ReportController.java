@@ -1,34 +1,28 @@
 package com.likelion.server.domain.report.web.controller;
 
 
+import com.likelion.server.domain.recommendedStartupSupport.service.RecommendedStartupSupportService;
+import com.likelion.server.domain.recommendedStartupSupport.web.dto.RecommendedStartupSupportDetailResponse;
 import com.likelion.server.domain.report.service.ReportService;
 import com.likelion.server.domain.report.web.dto.LatestReportDetailRequest;
-import com.likelion.server.domain.report.web.dto.ReportCreateResponse;
 import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
 import com.likelion.server.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping()
+@RequestMapping("/reports")
 public class ReportController {
 
     private final ReportService reportService;
-
-    // 레포트 생성
-    @PostMapping("/ideas/{ideaId}/reports")
-    public SuccessResponse<ReportCreateResponse> createReport(
-            @PathVariable("ideaId") Long ideaId
-    ) {
-        ReportCreateResponse data = reportService.createReport(ideaId);
-        return SuccessResponse.created(data);
-    }
-
+    private final RecommendedStartupSupportService recommendedStartupSupportService;
 
     // 최근 리포트 상세 조회
-    @GetMapping("/reports/latest")
+    @GetMapping("/latest")
     public SuccessResponse<ReportDetailResponse> getLatestReport(
             @RequestBody @Valid LatestReportDetailRequest request
     ) {
@@ -37,8 +31,9 @@ public class ReportController {
     }
 
     // ID 기반 상세 조회
-    @GetMapping("/reports/{reportId}")
+    @GetMapping("/{reportId}")
     public SuccessResponse<ReportDetailResponse> getById(@PathVariable Long reportId) {
         return SuccessResponse.ok(reportService.getById(reportId));
     }
+
 }

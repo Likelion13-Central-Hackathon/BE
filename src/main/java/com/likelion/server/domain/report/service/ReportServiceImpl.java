@@ -46,7 +46,7 @@ public class ReportServiceImpl implements ReportService {
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
     @Override
-    public ReportCreateResponse createReport(Long ideaId) {
+    public ReportCreateResponse createReportForIdea(Long ideaId) {
         Idea idea = ideaRepository.findById(ideaId)
                 .orElseThrow(IdeaNotFoundException::new);
 
