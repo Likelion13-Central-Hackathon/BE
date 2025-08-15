@@ -13,7 +13,7 @@ import com.likelion.server.domain.report.exception.ReportNotFoundException;
 import com.likelion.server.domain.report.generator.NewsGenerator;
 import com.likelion.server.domain.report.generator.ReportGenerator;
 import com.likelion.server.domain.report.repository.NewsRepository;
-import com.likelion.server.domain.report.repository.RecommendedStartupSupportRepository;
+import com.likelion.server.domain.startupSupport.repository.RecommendedStartupSupportRepository;
 import com.likelion.server.domain.report.repository.ReportRepository;
 import com.likelion.server.domain.report.web.dto.LatestReportDetailRequest;
 import com.likelion.server.domain.report.web.dto.ReportCreateResponse;
