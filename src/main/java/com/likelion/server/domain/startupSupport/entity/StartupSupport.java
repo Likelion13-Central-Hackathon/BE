@@ -38,15 +38,18 @@ public class StartupSupport extends BaseEntity {
     private String agency;
 
     // 나이 제한
+    @Column(length = 255)
     private String targetAge;
 
     // 지원 대상
+    @Column(columnDefinition = "TEXT")
     private String target;
 
     // 연락처
     private String contact;
 
-    // 상세링크
+    // 상세링크 (K-Startup 상세 페이지)
+    @Column(columnDefinition = "TEXT")
     private String link;
 
     // 모집 시작일
@@ -56,27 +59,29 @@ public class StartupSupport extends BaseEntity {
     private LocalDate endDate;
 
     // 신청 방법
+    @Column(columnDefinition = "TEXT")
     private String applyMethod;
 
     // 지원 내용
+    @Column(columnDefinition = "TEXT")
     private String supportDetails;
 
-    // 제출 서류
-    private String requiredDocuments;
+// === 추가된 필드 ===
 
-    // 신청 절차 및 평가 방법
-    private String evaluationMethod;
+    // 외부 참조 ID
+    private String externalRef;
 
+    // 안내 페이지 URL
+    @Column(columnDefinition = "TEXT")
+    private String guidanceUrl;
 
-// ==============================
+    // 모집 여부
+    private Boolean isRecruiting;
 
-    // 사업 특징
-    private String businessFeature;
-
-    // 사업 소개 정보
-    private String businessIntro;
-
-    // 지원 예산 및 규모
-    private String budget;
-
+    // === 필요 시 유지할 수 있는 확장 필드 ===
+    // private String requiredDocuments;
+    // private String evaluationMethod;
+    // private String businessFeature;
+    // private String businessIntro;
+    // private String budget;
 }
