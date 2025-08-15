@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -25,8 +26,8 @@ public abstract class BaseEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    //LocalDateTime -> yyyy.MM.dd
-    protected static String formatYmd(LocalDateTime dt) {
-        return (dt == null) ? null : dt.toLocalDate().format(formatter);
+    //LocalDate -> yyyy.MM.dd
+    public String formatYmd(LocalDate date) {
+        return (date == null) ? null : date.format(formatter);
     }
 }

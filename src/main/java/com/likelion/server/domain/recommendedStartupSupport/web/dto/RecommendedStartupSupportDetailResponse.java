@@ -2,6 +2,7 @@ package com.likelion.server.domain.recommendedStartupSupport.web.dto;
 
 import com.likelion.server.domain.recommendedStartupSupport.entity.RecommendedStartupSupport;
 import com.likelion.server.domain.startupSupport.entity.StartupSupport;
+import com.likelion.server.domain.startupSupport.support.RegionMapper;
 
 public record RecommendedStartupSupportDetailResponse(
         String supportArea, // 지원 분야
@@ -27,10 +28,10 @@ public record RecommendedStartupSupportDetailResponse(
                 s.getSupportArea(),
                 s.getTitle(),
                 s.getLink(),
-                s.getStartDate(),
-                s.getEndDate(),
-                s.getRegion(),
-                s.getBusinessDuration(), // 업력
+                s.formatYmd(s.getStartDate()),
+                s.formatYmd(s.getEndDate()),
+                RegionMapper.toKorean(s.getRegion()), // 지역
+                s.getBusinessDuration().toString(), // 업력
                 s.getAgency(),
                 s.getTarget(),
                 s.getContact(),// 연락처
