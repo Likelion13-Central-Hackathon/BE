@@ -96,10 +96,37 @@ public class ReportServiceImpl implements ReportService {
     // 추천 창업 지원 사업 상세 조회
     @Override
     public StartupSupportDetailResponse getDetailSupports(Long reportId, Long supportId) {
+        // 404: 레포트 찾을 수 없음
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(ReportNotFoundByIdException::new);
+
         // 404: 창업 지원 사업 찾을 수 없음
         StartupSupport support = startupSupportRepository.findById(supportId)
                 .orElseThrow(StartupSupportNotFoundException::new);
 
+
+        RecommendedStartupSupport recommendedStartupSupport = recommendedStartupSupportRepository.
+
+        //return new StartupSupportDetailResponse(
+        //                support.getSupportArea(),
+        //                support.getTitle(),
+        //                support.getLink(),
+        //                support.getStartDate(),
+        //                support.getEndDate(),
+        //                support.getRegion(),
+        //                support.getBusinessDuration(), // 업력
+        //                support.getAgency(),
+        //                support.getTarget(),
+        //                support.getContact(),// 연락처
+        //                support.getApplyMethod(), // 신청방법
+        //                support.getSupportDetails(), // 지원 내용
+        //                support.getRequiredDocuments(), // 제출 서류
+        //                support.getApplyProcedure(),
+        //                support.getEvaluationMethod(),
+        //
+        //                //        int suitability, // 적합도
+        //                //        String reason // 추천한 이유
+        //        );
     }
 
 
