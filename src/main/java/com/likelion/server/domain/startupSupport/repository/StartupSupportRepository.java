@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface StartupSupportRepository extends JpaRepository<StartupSupport, Long> {
 
@@ -22,4 +23,6 @@ public interface StartupSupportRepository extends JpaRepository<StartupSupport, 
         """)
     Page<StartupSupport> findOpenByRegions(List<Region> regions, LocalDate today, Pageable pageable);
 
+    // id 내림차순으로 가장 최근 1건
+    Optional<StartupSupport> findTopByOrderByIdDesc();
 }
