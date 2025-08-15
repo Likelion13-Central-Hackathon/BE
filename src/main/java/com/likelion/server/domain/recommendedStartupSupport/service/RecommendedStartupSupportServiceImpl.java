@@ -1,6 +1,7 @@
 package com.likelion.server.domain.recommendedStartupSupport.service;
 
 import com.likelion.server.domain.recommendedStartupSupport.entity.RecommendedStartupSupport;
+import com.likelion.server.domain.recommendedStartupSupport.exception.RecommendedStartupSupportEmptyForReportException;
 import com.likelion.server.domain.recommendedStartupSupport.exception.RecommendedStartupSupportNotFoundException;
 import com.likelion.server.domain.recommendedStartupSupport.repository.RecommendedStartupSupportRepository;
 import com.likelion.server.domain.recommendedStartupSupport.web.dto.RecommendedStartupSupportDetailResponse;
@@ -20,6 +21,11 @@ public class RecommendedStartupSupportServiceImpl implements RecommendedStartupS
     public List<RecommendedStartupSupportSummaryResponse> getByReportId(Long reportId) {
         // DB 조회(상위 3개, 레포트 ID 기반, 적합도 기반 내림차순 정렬)
         List<RecommendedStartupSupport> supportList = recommendedStartupSupportRepository.findTop3ByReportIdOrderBySuitabilityDesc((reportId));
+
+        // 404: 해당 레포트에 대한 추천 창업 지원사업이 존재하지 않음
+        if (supportList.isEmpty()) {
+            throw new RecommendedStartupSupportEmptyForReportException();
+        }
 
         // Entity -> DTO
         return supportList.stream()
