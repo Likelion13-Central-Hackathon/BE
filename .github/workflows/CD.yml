@@ -39,9 +39,9 @@ jobs:
             docker pull ${{ env.IMAGE }}:latest
 
             echo "[2/3] Restart container with new image..."
-            docker stop [be] || true
-            docker rm [be] || true
-            docker run -d --name [be] \
+            docker stop be || true
+            docker rm be || true
+            docker run -d --name be \
               --env-file /home/${{ secrets.SSH_USER }}/.env \
               -p 8080:8080 \
               ${{ env.IMAGE }}:latest
