@@ -1,6 +1,5 @@
 package com.likelion.server.domain.startupSupport.entity;
 
-import com.likelion.server.domain.startupSupport.entity.enums.BusinessDuration;
 import com.likelion.server.domain.startupSupport.entity.enums.Region;
 import com.likelion.server.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -31,8 +30,7 @@ public class StartupSupport extends BaseEntity {
     private Region region;
 
     // 업력 대상
-    @Enumerated(EnumType.STRING)
-    private BusinessDuration businessDuration;
+    private String businessDuration;
 
     // 주관기관명
     private String agency;
