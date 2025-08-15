@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reports")
@@ -33,7 +35,5 @@ public class ReportController {
     public SuccessResponse<ReportDetailResponse> getById(@PathVariable Long reportId) {
         return SuccessResponse.ok(reportService.getById(reportId));
     }
-
-    // 레포트 기반 추천 창업 지원사업 조회
 
 }

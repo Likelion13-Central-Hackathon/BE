@@ -21,7 +21,7 @@ public class RecommendedStartupSupportServiceImpl implements RecommendedStartupS
         // DB 조회(상위 3개, 레포트 ID 기반, 적합도 기반 내림차순 정렬)
         List<RecommendedStartupSupport> supportList = recommendedStartupSupportRepository.findTop3ByReportIdOrderBySuitabilityDesc((reportId));
 
-        // 반환
+        // Entity -> DTO
         return supportList.stream()
                 .map(s -> new RecommendedStartupSupportSummaryResponse(
                         s.getId(),
@@ -43,6 +43,7 @@ public class RecommendedStartupSupportServiceImpl implements RecommendedStartupS
                 .orElseThrow(RecommendedStartupSupportNotFoundException::new);
         StartupSupport startupSupport = recommendedStartupSupport.getStartupSupport();
 
+        // Entity -> DTO
         return RecommendedStartupSupportDetailResponse.of(
                 startupSupport,
                 recommendedStartupSupport);
