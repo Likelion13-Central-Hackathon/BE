@@ -3,7 +3,7 @@ package com.likelion.server.domain.startupSupport.service;
 import com.likelion.server.domain.startupSupport.entity.StartupSupport;
 import com.likelion.server.domain.startupSupport.entity.enums.Region;
 import com.likelion.server.domain.startupSupport.repository.StartupSupportRepository;
-import com.likelion.server.domain.startupSupport.support.RegionMapper;
+import com.likelion.server.domain.startupSupport.mapper.RegionMapper;
 import com.likelion.server.domain.startupSupport.web.dto.StartupSupportSummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -45,7 +45,7 @@ public class StartupSupportServiceImpl implements StartupSupportService{
         return pageData.map(startupSupport -> new StartupSupportSummaryResponse(
                 startupSupport.getId(),
                 startupSupport.getSupportArea(),
-                RegionMapper.toKorean(startupSupport.getRegion()),
+                RegionMapper.toString(startupSupport.getRegion()),
                 startupSupport.getTitle(),
                 startupSupport.getLink()
         )) .getContent();

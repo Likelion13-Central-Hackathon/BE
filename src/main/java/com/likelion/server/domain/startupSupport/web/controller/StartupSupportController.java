@@ -26,4 +26,5 @@ public class StartupSupportController {
         List<StartupSupportSummaryResponse> data = startupSupportService.getPagedOpenSupports(region, page, num);
         return SuccessResponse.ok(data);
     }
+
 }

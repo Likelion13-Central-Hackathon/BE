@@ -49,10 +49,6 @@ public class StartupSupport extends BaseEntity {
     // 상세링크
     private String link;
 
-    // 핵심 내용 요약
-    @Lob
-    private String coreContent;
-
     // 모집 시작일
     private LocalDate startDate;
 
@@ -62,32 +58,25 @@ public class StartupSupport extends BaseEntity {
     // 신청 방법
     private String applyMethod;
 
-    // 신청 절차
-    @Lob
-    private String applyProcedure;
-
-    // 평가 방법
-    @Lob
-    private String evaluationMethod;
-
-    // 제출 서류
-    @Lob
-    private String requiredDocuments;
-
-    // 지원 예산 및 규모
-    @Lob
-    private String budget;
-
     // 지원 내용
-    @Lob
     private String supportDetails;
 
+    // 제출 서류
+    private String requiredDocuments;
+
+    // 신청 절차 및 평가 방법
+    private String evaluationMethod;
+
+
+// ==============================
+
     // 사업 특징
-    @Lob
     private String businessFeature;
 
     // 사업 소개 정보
-    @Lob
     private String businessIntro;
+
+    // 지원 예산 및 규모
+    private String budget;
 
 }

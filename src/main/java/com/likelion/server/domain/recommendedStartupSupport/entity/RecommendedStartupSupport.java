@@ -1,6 +1,7 @@
-package com.likelion.server.domain.startupSupport.entity;
+package com.likelion.server.domain.recommendedStartupSupport.entity;
 
 import com.likelion.server.domain.report.entity.Report;
+import com.likelion.server.domain.startupSupport.entity.StartupSupport;
 import com.likelion.server.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,12 +19,12 @@ public class RecommendedStartupSupport extends BaseEntity {
     private Long id;
 
     // 추천 지원 사업 N:1 리포트
-    @ManyToOne(fetch = FetchType.LAZY) // FK: reports_id
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reports_id", nullable = false)
     private Report report;
 
     // 추천 지원 사업 N:1 지원 사업
-    @ManyToOne(fetch = FetchType.LAZY) // FK: startup_supports_id
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "startup_supports_id", nullable = false)
     private StartupSupport startupSupport;
 
