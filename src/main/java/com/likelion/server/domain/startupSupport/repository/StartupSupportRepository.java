@@ -21,4 +21,5 @@ public interface StartupSupportRepository extends JpaRepository<StartupSupport, 
           AND (s.endDate IS NULL OR s.endDate >= :today)
         """)
     Page<StartupSupport> findOpenByRegions(List<Region> regions, LocalDate today, Pageable pageable);
+
 }
