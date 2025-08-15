@@ -61,14 +61,15 @@ public class StartupSupport extends BaseEntity {
     // 지원 내용
     private String supportDetails;
 
+    // 제출 서류
+    private String requiredDocuments;
+
     // 신청 절차
     private String applyProcedure;
-
     // 평가 방법
     private String evaluationMethod;
 
-    // 제출 서류
-    private String requiredDocuments;
+
 
 // ==============================
 

@@ -8,6 +8,4 @@ import java.util.List;
 public interface StartupSupportService {
     // 창업 지원 사업 목록 조회
     public List<StartupSupportSummaryResponse> getPagedOpenSupports(String regionParam, int page, int num);
-    // 창업 지원 사업 상세 조회
-    public StartupSupportDetailResponse getDetailSupports(Long supportId);
 }

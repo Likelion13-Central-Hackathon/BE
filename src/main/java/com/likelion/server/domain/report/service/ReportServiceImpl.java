@@ -13,11 +13,16 @@ import com.likelion.server.domain.report.exception.ReportNotFoundException;
 import com.likelion.server.domain.report.generator.NewsGenerator;
 import com.likelion.server.domain.report.generator.ReportGenerator;
 import com.likelion.server.domain.report.repository.NewsRepository;
+import com.likelion.server.domain.startupSupport.entity.RecommendedStartupSupport;
+import com.likelion.server.domain.startupSupport.entity.StartupSupport;
+import com.likelion.server.domain.startupSupport.exception.StartupSupportNotFoundException;
 import com.likelion.server.domain.startupSupport.repository.RecommendedStartupSupportRepository;
 import com.likelion.server.domain.report.repository.ReportRepository;
 import com.likelion.server.domain.report.web.dto.LatestReportDetailRequest;
 import com.likelion.server.domain.report.web.dto.ReportCreateResponse;
 import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
+import com.likelion.server.domain.startupSupport.repository.StartupSupportRepository;
+import com.likelion.server.domain.startupSupport.web.dto.StartupSupportDetailResponse;
 import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +41,7 @@ public class ReportServiceImpl implements ReportService {
     private final ReportRepository reportRepository;
     private final NewsRepository newsRepository;
     private final RecommendedStartupSupportRepository recommendedStartupSupportRepository;
+    private final StartupSupportRepository startupSupportRepository;
     private final IdeaInfoAssembler ideaInfoAssembler;
     private final IdeaDescriptionFormatter ideaDescriptionFormatter;
     private final ReportGenerator reportGenerator;
@@ -85,6 +91,19 @@ public class ReportServiceImpl implements ReportService {
 
         return toResponse(report);
     }
+
+
+    // 추천 창업 지원 사업 상세 조회
+    @Override
+    public StartupSupportDetailResponse getDetailSupports(Long reportId, Long supportId) {
+        // 404: 창업 지원 사업 찾을 수 없음
+        StartupSupport support = startupSupportRepository.findById(supportId)
+                .orElseThrow(StartupSupportNotFoundException::new);
+
+    }
+
+
+    // ================ 편의 메서드 ==================
 
     private ReportDetailResponse toResponse(Report report) {
         // steps 배열 생성
