@@ -1,6 +1,7 @@
 package com.likelion.server.domain.admin.web.controller;
 
 import com.likelion.server.domain.admin.service.AdminService;
+import com.likelion.server.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +15,8 @@ public class AdminController {
 
     // 청년 창업 지원 사업 수집
     @PostMapping("/startup-supports/batch")
-    public void batchStartup() {
+    public SuccessResponse<?> batchStartup() {
         adminService.syncLatestStartupSupports();
+        return SuccessResponse.created(null);
     }
 }
