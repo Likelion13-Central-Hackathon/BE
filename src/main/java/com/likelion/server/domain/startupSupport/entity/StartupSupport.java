@@ -70,6 +70,7 @@ public class StartupSupport extends BaseEntity {
 // ====== 추가된 필드 =======
 
     // 외부 참조 ID
+    @Column(unique = true)
     private String externalRef;
 
     // 안내 페이지 URL

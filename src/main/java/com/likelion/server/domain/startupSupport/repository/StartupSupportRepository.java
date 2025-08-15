@@ -25,4 +25,8 @@ public interface StartupSupportRepository extends JpaRepository<StartupSupport, 
 
     // id 내림차순으로 가장 최근 1건
     Optional<StartupSupport> findTopByOrderByIdDesc();
+
+    // 중복 체크
+    boolean existsByExternalRef(String externalRef);
+    boolean existsByTitle(String title);
 }

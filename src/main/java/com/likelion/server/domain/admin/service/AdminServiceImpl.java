@@ -88,5 +88,7 @@ public class AdminServiceImpl implements AdminService{
         }
         log.info("[SYNC] 저장 완료 - 성공:{}건, 스킵:{}건", success, skipped);
 
+
+
     }
 }
