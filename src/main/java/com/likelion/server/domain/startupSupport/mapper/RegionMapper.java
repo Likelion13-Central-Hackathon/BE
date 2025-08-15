@@ -1,4 +1,4 @@
-package com.likelion.server.domain.startupSupport.support;
+package com.likelion.server.domain.startupSupport.mapper;
 
 import com.likelion.server.domain.startupSupport.entity.enums.Region;
 import com.likelion.server.domain.startupSupport.exception.InvalidRegionException;
@@ -6,7 +6,7 @@ import com.likelion.server.domain.startupSupport.exception.RegionRequiredExcepti
 
 import java.util.Map;
 
-// FE 요청은 한글, DB 저장 및 Enum 값은 영어 -> 매핑을 위한 클래스
+// Region <-> String
 public final class RegionMapper {
     private RegionMapper() {}
 
@@ -28,7 +28,7 @@ public final class RegionMapper {
             // 마찬가지로 더 추가될 예정
     );
 
-    // Request -> DB 조회 (한->영)
+    // Enum -> String
     public static Region toEnum(String value) {
         if (value == null || value.isBlank()) {
             // 400: region은 필수 메서드
@@ -42,7 +42,7 @@ public final class RegionMapper {
         throw new InvalidRegionException();
     }
 
-    // DB 조회 -> Response (영->한)
+    // String -> Enum
     public static String toKorean(Region region) {
         return ENUM_TO_KOR.getOrDefault(region, region.name());
     }

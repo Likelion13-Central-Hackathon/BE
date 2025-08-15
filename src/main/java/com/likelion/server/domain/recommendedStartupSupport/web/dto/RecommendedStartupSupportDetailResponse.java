@@ -2,7 +2,7 @@ package com.likelion.server.domain.recommendedStartupSupport.web.dto;
 
 import com.likelion.server.domain.recommendedStartupSupport.entity.RecommendedStartupSupport;
 import com.likelion.server.domain.startupSupport.entity.StartupSupport;
-import com.likelion.server.domain.startupSupport.support.RegionMapper;
+import com.likelion.server.domain.startupSupport.mapper.RegionMapper;
 
 public record RecommendedStartupSupportDetailResponse(
         String supportArea, // 지원 분야
