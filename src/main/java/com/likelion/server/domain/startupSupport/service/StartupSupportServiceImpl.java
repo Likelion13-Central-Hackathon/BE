@@ -55,6 +55,9 @@ public class StartupSupportServiceImpl implements StartupSupportService{
     // 창업 지원 사업 상세 조회
     @Override
     public StartupSupportDetailResponse getDetailSupports(Long supportId) {
+        StartupSupport support = startupSupportRepository.findById(supportId)
+                .orElseThrow(new )
+
         return null;
     }
 }
