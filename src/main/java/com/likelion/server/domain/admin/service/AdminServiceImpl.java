@@ -3,7 +3,6 @@ package com.likelion.server.domain.admin.service;
 import com.likelion.server.domain.admin.web.dto.StartupSupportSyncRequest;
 import com.likelion.server.domain.admin.web.dto.StartupSupportSyncResponse;
 import com.likelion.server.domain.startupSupport.entity.StartupSupport;
-import com.likelion.server.domain.startupSupport.exception.StartupSupportNotFoundException;
 import com.likelion.server.domain.startupSupport.repository.StartupSupportRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +42,7 @@ public class AdminServiceImpl implements AdminService{
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         StartupSupportSyncRequest payload = new StartupSupportSyncRequest(cursor);
-        HttpEntity<StartupSupportSyncRequest> entity = new HttpEntity<>(payload, headers);
+        HttpEntity<StartupSupportSyncRequest> httpEntity = new HttpEntity<>(payload, headers);
 
         // 3) POST 호출
         ResponseEntity<List<StartupSupportSyncResponse>> response;
@@ -51,12 +50,12 @@ public class AdminServiceImpl implements AdminService{
             response = restTemplate.exchange(
                     syncUrl,
                     HttpMethod.POST,
-                    entity,
+                    httpEntity,
                     new ParameterizedTypeReference<List<StartupSupportSyncResponse>>() {}
             );
         } catch (Exception e) {
             log.error("[SYNC] 외부 서버 호출 실패 url={}, cursor={}, err={}", syncUrl, cursor, e.toString());
-            throw new IllegalStateException("동기화 중 통신 오류가 발생했습니다.", e);
+            throw new IllegalStateException("동기화 중 통신 오류 발생", e);
         }
 
         if (!response.getStatusCode().is2xxSuccessful()) {
@@ -75,18 +74,19 @@ public class AdminServiceImpl implements AdminService{
 
         for (StartupSupportSyncResponse d : incoming) {
             try {
-                batch.add(toEntity(d));
+                StartupSupport startupSupport = StartupSupport.toEntity(d);
+                batch.add(startupSupport);
                 success++;
             } catch (Exception ex) {
                 skipped++;
-                log.warn("[SYNC] 변환 스킵 externalRef={}, reason={}", d.externalRef(), ex.getMessage());
+                log.warn("[SYNC] 변환 스킵 externalRef={}, reason={}", d.externalRef(), ex.toString());
             }
         }
+
         if (!batch.isEmpty()) {
             supportRepository.saveAll(batch);
         }
         log.info("[SYNC] 저장 완료 - 성공:{}건, 스킵:{}건", success, skipped);
+
     }
-
-
 }

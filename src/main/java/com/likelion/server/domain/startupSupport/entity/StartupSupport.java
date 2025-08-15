@@ -63,6 +63,7 @@ public class StartupSupport extends BaseEntity {
     private String applyMethod;
 
     // 지원 내용
+    @Lob
     @Column(columnDefinition = "TEXT")
     private String supportDetails;
 
