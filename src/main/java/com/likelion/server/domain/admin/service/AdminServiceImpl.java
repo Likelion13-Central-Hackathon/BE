@@ -11,10 +11,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -69,26 +72,59 @@ public class AdminServiceImpl implements AdminService{
         }
 
         // 4. 저장
-        int success = 0, skipped = 0;
+        int success = 0, skipped = 0, skippedDupExt = 0, skippedDupTitle = 0;
+
+        // 같은 배치 안에서도 중복 금지
+        Set<String> batchExtRefs = new HashSet<>();
+        Set<String> batchTitles  = new HashSet<>();
+
         List<StartupSupport> batch = new ArrayList<>(incoming.size());
 
         for (StartupSupportSyncResponse d : incoming) {
             try {
+                // 1) 배치 내부 중복 제거
+                String ext = d.externalRef();
+                String title = d.title();
+
+                if (StringUtils.hasText(ext)) {
+                    // 같은 배치 내 extRef 중복 스킵
+                    if (!batchExtRefs.add(ext)) {
+                        skippedDupExt++;
+                        continue;
+                    }
+                    // DB에 이미 존재하면 스킵(저장x)
+                    if (supportRepository.existsByExternalRef(ext)) {
+                        skippedDupExt++;
+                        continue;
+                    }
+                } else if (StringUtils.hasText(title)) {
+                    // extRef 없을 때는 title로 보조 중복 체크
+                    if (!batchTitles.add(title)) {
+                        skippedDupTitle++;
+                        continue;
+                    }
+                    if (supportRepository.existsByTitle(title)) {
+                        skippedDupTitle++;
+                        continue;
+                    }
+                }
+
+                // 2) 엔티티 변환 및 추가
                 StartupSupport startupSupport = StartupSupport.toEntity(d);
                 batch.add(startupSupport);
                 success++;
+
             } catch (Exception ex) {
                 skipped++;
-                log.warn("[SYNC] 변환 스킵 externalRef={}, reason={}", d.externalRef(), ex.toString());
+                log.warn("[SYNC] 변환/검증 스킵 externalRef={}, reason={}", d.externalRef(), ex.toString());
             }
         }
 
         if (!batch.isEmpty()) {
             supportRepository.saveAll(batch);
         }
-        log.info("[SYNC] 저장 완료 - 성공:{}건, 스킵:{}건", success, skipped);
-
-
+        log.info("[SYNC] 저장 완료 - 신규 저장:{}건, 변환스킵:{}건, 중복스킵(extRef):{}건, 중복스킵(title):{}건",
+                success, skipped, skippedDupExt, skippedDupTitle);
 
     }
 }
