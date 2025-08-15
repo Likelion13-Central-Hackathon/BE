@@ -5,7 +5,7 @@ import com.likelion.server.domain.report.web.dto.ReportCreateResponse;
 import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
 
 public interface ReportService {
-    ReportCreateResponse createReport(Long ideaId);
+    ReportCreateResponse createReportForIdea(Long ideaId);
 
     ReportDetailResponse getLatestReport(LatestReportDetailRequest request);
 
