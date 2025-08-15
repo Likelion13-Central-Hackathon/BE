@@ -1,4 +1,4 @@
-package com.likelion.server.domain.startupSupport.web.dto;
+package com.likelion.server.domain.recommendedStartupSupport.web.dto;
 
 public record StartupSupportDetailResponse(
         String supportArea, // 지원 분야

@@ -1,6 +1,5 @@
 package com.likelion.server.domain.startupSupport.service;
 
-import com.likelion.server.domain.startupSupport.web.dto.StartupSupportDetailResponse;
 import com.likelion.server.domain.startupSupport.web.dto.StartupSupportSummaryResponse;
 
 import java.util.List;

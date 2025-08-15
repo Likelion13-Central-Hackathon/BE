@@ -12,12 +12,11 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "reports")
 public class Report extends BaseEntity {
-    // PK
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 뉴스 N:1 리포트
-    @ManyToOne(fetch = FetchType.LAZY) // FK: ideas_id
+    // 아이디어 1:N 레포트
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ideas_id", nullable = false)
     private Idea idea;
 
