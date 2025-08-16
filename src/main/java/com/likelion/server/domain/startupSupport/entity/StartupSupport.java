@@ -1,12 +1,14 @@
 package com.likelion.server.domain.startupSupport.entity;
 
-import com.likelion.server.domain.startupSupport.entity.enums.BusinessDuration;
+import com.likelion.server.domain.admin.web.dto.StartupSupportSyncResponse;
 import com.likelion.server.domain.startupSupport.entity.enums.Region;
+import com.likelion.server.domain.startupSupport.mapper.RegionMapper;
 import com.likelion.server.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Getter
@@ -15,7 +17,6 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "startup_supports") // 지원사업
 public class StartupSupport extends BaseEntity {
-    // PK
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -31,22 +32,24 @@ public class StartupSupport extends BaseEntity {
     private Region region;
 
     // 업력 대상
-    @Enumerated(EnumType.STRING)
-    private BusinessDuration businessDuration;
+    private String businessDuration;
 
     // 주관기관명
     private String agency;
 
     // 나이 제한
+    @Column(length = 255)
     private String targetAge;
 
     // 지원 대상
+    @Column(columnDefinition = "TEXT")
     private String target;
 
     // 연락처
     private String contact;
 
-    // 상세링크
+    // 상세링크 (K-Startup 상세 페이지)
+    @Column(columnDefinition = "TEXT")
     private String link;
 
     // 모집 시작일
@@ -56,27 +59,55 @@ public class StartupSupport extends BaseEntity {
     private LocalDate endDate;
 
     // 신청 방법
+    @Column(columnDefinition = "TEXT")
     private String applyMethod;
 
     // 지원 내용
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String supportDetails;
 
-    // 제출 서류
-    private String requiredDocuments;
+// ====== 추가된 필드 =======
 
-    // 신청 절차 및 평가 방법
-    private String evaluationMethod;
+    // 외부 참조 ID
+    @Column(unique = true)
+    private String externalRef;
 
+    // 안내 페이지 URL
+    @Column(columnDefinition = "TEXT")
+    private String guidanceUrl;
 
-// ==============================
+    // 모집 여부
+    private Boolean isRecruiting;
 
-    // 사업 특징
-    private String businessFeature;
+    // ========================== 유틸 메서드 ===========================
+    private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE;
 
-    // 사업 소개 정보
-    private String businessIntro;
+    // FastAPI 응답 DTO -> 엔티티 변환 메서드
+    public static StartupSupport toEntity(StartupSupportSyncResponse s) {
+        return StartupSupport.builder()
+                .title(s.title())
+                .supportArea(s.supportArea())
+                .region(RegionMapper.toEnum(s.region())) // String  → Enum
+                .businessDuration(s.businessDuration())
+                .agency(s.agency())
+                .targetAge(s.targetAge())
+                .target(s.target())
+                .contact(s.contact())
+                .link(s.link())
+                .startDate(parseDate(s.startDate())) // yyyy-MM-dd
+                .endDate(parseDate(s.endDate()))
+                .applyMethod(s.applyMethod())
+                .supportDetails(s.supportDetails())
+                .externalRef(s.externalRef())
+                .guidanceUrl(s.guidanceUrl())
+                .isRecruiting(Boolean.TRUE.equals(s.isRecruiting()))
+                .build();
+    }
 
-    // 지원 예산 및 규모
-    private String budget;
-
+    // string -> Date 객체
+    private static LocalDate parseDate(String s) {
+        if (s == null || s.isBlank()) return null;
+        return LocalDate.parse(s, ISO);
+    }
 }
