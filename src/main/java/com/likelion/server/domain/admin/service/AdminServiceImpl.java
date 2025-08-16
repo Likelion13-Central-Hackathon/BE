@@ -99,7 +99,7 @@ public class AdminServiceImpl implements AdminService{
                         continue;
                     }
                 } else if (StringUtils.hasText(title)) {
-                    // extRef 없을 때는 title로 보조 중복 체크
+                    // extRef 없을 때(openAPI 응답에 포함 x)는 title로 보조 중복 체크
                     if (!batchTitles.add(title)) {
                         skippedDupTitle++;
                         continue;
