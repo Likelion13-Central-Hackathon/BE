@@ -6,6 +6,9 @@ import com.likelion.server.domain.idea.repository.IdeaRepository;
 import com.likelion.server.domain.idea.support.IdeaDescriptionFormatter;
 import com.likelion.server.domain.idea.support.IdeaInfoAssembler;
 import com.likelion.server.domain.idea.web.dto.IdeaFullInfoDto;
+import com.likelion.server.domain.recommendedStartupSupport.entity.RecommendedStartupSupport;
+import com.likelion.server.domain.recommendedStartupSupport.exception.RecommendedStartupSupportCreatedException;
+import com.likelion.server.infra.ai.dto.SimilarSupport;
 import com.likelion.server.domain.report.entity.Report;
 import com.likelion.server.domain.report.exception.AuthFailException;
 import com.likelion.server.domain.report.exception.ReportNotFoundByIdException;
@@ -18,11 +21,15 @@ import com.likelion.server.domain.report.repository.ReportRepository;
 import com.likelion.server.domain.report.web.dto.LatestReportDetailRequest;
 import com.likelion.server.domain.report.web.dto.ReportCreateResponse;
 import com.likelion.server.domain.report.web.dto.ReportDetailResponse;
+import com.likelion.server.domain.startupSupport.entity.StartupSupport;
 import com.likelion.server.domain.startupSupport.repository.StartupSupportRepository;
 import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.domain.user.repository.UserRepository;
+import com.likelion.server.infra.ai.SimilarSupportClient;
+import com.likelion.server.infra.gpt.GptChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -42,25 +49,37 @@ public class ReportServiceImpl implements ReportService {
     private final IdeaDescriptionFormatter ideaDescriptionFormatter;
     private final ReportGenerator reportGenerator;
     private final NewsGenerator newsGenerator;
+    private final GptChatService gptChatService;
+    private final SimilarSupportClient similarSupportClient;
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
     @Override
+    @Transactional
     public ReportCreateResponse createReportForIdea(Long ideaId) {
         Idea idea = ideaRepository.findById(ideaId)
                 .orElseThrow(IdeaNotFoundException::new);
 
-        // 생성에 필요한 Idea 데이터 가공
+        // 1. 생성에 필요한 Idea 데이터 가공
         IdeaFullInfoDto info = ideaInfoAssembler.toFullInfo(idea);
         String ideaText = ideaDescriptionFormatter.toDescription(info);
 
         Report report = reportGenerator.generate(idea, ideaText); // 레포트 생성
         Report saved = reportRepository.save(report);
 
-        // 뉴스 생성
+        // 2. 뉴스 생성
         newsGenerator.generate(report, ideaText);
 
-        // TODO: 지원사업 생성
+        // 3. 지원사업 생성
+        // 제목+내용 유사도 상위 K(3)개 요청
+        List<SimilarSupport> sims =
+                similarSupportClient.getTopKSims("", idea.getDescription(), 30); //idea.getTitle()
+        // 조건 기반 상위 3개 반환
+        if (sims == null || sims.isEmpty()) {
+            throw new RecommendedStartupSupportCreatedException();
+        }
+
+        // 최종 상위 3개 선발 및 RecommendedStartupSupport 저장
 
         return new ReportCreateResponse(saved.getId());
     }

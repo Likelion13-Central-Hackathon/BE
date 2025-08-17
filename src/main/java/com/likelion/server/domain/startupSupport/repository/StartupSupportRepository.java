@@ -29,4 +29,6 @@ public interface StartupSupportRepository extends JpaRepository<StartupSupport, 
     // 중복 체크
     boolean existsByExternalRef(String externalRef);
     boolean existsByTitle(String title);
+
+    StartupSupport findByExternalRef(String externalRef);
 }
