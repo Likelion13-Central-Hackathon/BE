@@ -25,7 +25,7 @@ public class IdeaController {
     }
 
     // 창업 아이디어 기반 레포트 생성
-    @PostMapping("/ideas/{ideaId}/reports")
+    @PostMapping("/{ideaId}/reports")
     public SuccessResponse<ReportCreateResponse> createReport(
             @PathVariable("ideaId") Long ideaId
     ) {

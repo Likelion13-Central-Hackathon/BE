@@ -72,18 +72,21 @@ public class ReportServiceImpl implements ReportService {
 
         Report report = reportGenerator.generate(idea, ideaText); // 레포트 생성
         Report saved = reportRepository.save(report);
+        log.debug("Idea 데이터 가공 완료");
 
         // 2. 뉴스 생성
         newsGenerator.generate(report, ideaText);
+        log.debug("Report saved: {}", saved);
 
         // 3. 지원사업 생성
-        // 제목+내용 유사도 상위 K(30)개 요청
+        // 제목+내용 유사도 상위 K개 요청
         List<SimilarSupport> similarSupports =
-                similarSupportClient.getTopKSims("", idea.getDescription(), 30); //idea.getTitle()
+                similarSupportClient.getTopKSims("", idea.getDescription(), 50); //idea.getTitle()
         if (similarSupports == null || similarSupports.isEmpty()) {
             log.debug("유사도 상위 k개 요청 반환값 비어있음");
             throw new RecommendedStartupSupportCreatedException();
         }
+        log.debug("유사도 {}개 요청 완료", similarSupports.size());
 
         // similarSupports -> startupSupports
         List<StartupSupport> startupSupports = new ArrayList<>();
@@ -107,6 +110,7 @@ public class ReportServiceImpl implements ReportService {
             log.debug("similarSupports -> startupSupports 결과 비어있음");
             throw new RecommendedStartupSupportCreatedException();
         }
+        log.debug("similarSupports -> startupSupports 성공");
 
         // 최종 상위 3개 선발 및 RecommendedStartupSupport 저장
         int savedCnt = recommendedStartupSupportSelector.selectAndSaveTop3(
@@ -114,6 +118,7 @@ public class ReportServiceImpl implements ReportService {
                 ideaFullInfoDto,
                 startupSupports
         );
+        log.debug("저장 완료: similarSupports -> savedCnt <UNK> {}", savedCnt);
 
         if (savedCnt == 0) {
             throw new RecommendedStartupSupportCreatedException(); // 필터 후 0개인 경우

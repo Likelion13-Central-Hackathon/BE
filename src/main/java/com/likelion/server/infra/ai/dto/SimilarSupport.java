@@ -1,7 +1,9 @@
 package com.likelion.server.infra.ai.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record SimilarSupport(
-        String externalRef,
+        @JsonProperty("external_ref") String externalRef,
         double score
 ) {
 }

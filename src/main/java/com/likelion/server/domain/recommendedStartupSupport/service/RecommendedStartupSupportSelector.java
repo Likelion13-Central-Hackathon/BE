@@ -83,7 +83,7 @@ public class RecommendedStartupSupportSelector {
 
     // 마감 공고 제거
     private boolean isClosed(StartupSupport s, LocalDate today) {
-        if (s.getEndDate() != null && s.getEndDate().isBefore(today)) return true;
+        if (s.getEndDate() != null && s.getEndDate().isBefore(today)) return true; // 오늘까지 보이게
         if (Boolean.FALSE.equals(s.getIsRecruiting())) return true;
         return false;
     }
@@ -100,6 +100,10 @@ public class RecommendedStartupSupportSelector {
         if (parts.length == 0) return new EligibilityResult(true, 0.0);
 
         int ideaYears = approxYears(idea.businessAge()); // enum: PRE=0, EARLY=3, GROWTH=7, NEW=10
+
+        if (idea.businessAge() == null) {
+            return new EligibilityResult(true, 0.0); // 통과(보너스 없음)
+        }
 
         boolean matched = false;
         boolean strong = false;
