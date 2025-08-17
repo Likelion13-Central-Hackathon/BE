@@ -58,7 +58,7 @@ public class AdminServiceImpl implements AdminService{
                     new ParameterizedTypeReference<List<StartupSupportSyncResponse>>() {}
             );
         } catch (Exception e) {
-            log.error("[SYNC] 외부 서버 호출 실패 url={}, cursor={}, err={}", syncUrl, cursor, e.toString());
+            log.error( "FastAPI 서버 호출 실패 url={}, cursor={}, err={}", syncUrl, cursor, e.toString());
             throw new IllegalStateException("동기화 중 통신 오류 발생", e);
         }
 
@@ -68,7 +68,7 @@ public class AdminServiceImpl implements AdminService{
 
         List<StartupSupportSyncResponse> incoming = response.getBody();
         if (incoming == null || incoming.isEmpty()) {
-            log.info("[SYNC] 신규 데이터 없음 (cursor={})", cursor);
+            log.info("신규 데이터 없음 (cursor={})", cursor);
             return null; // 신규 없음
         }
 
@@ -117,12 +117,12 @@ public class AdminServiceImpl implements AdminService{
 
             } catch (Exception ex) {
                 skipped++;
-                log.warn("[SYNC] 변환/검증 스킵 externalRef={}, reason={}", d.externalRef(), ex.toString());
+                log.warn(" 변환/검증 스킵 externalRef={}, reason={}", d.externalRef(), ex.toString());
             }
         }
         List<StartupSupport> saved = supportRepository.saveAll(batch);
 
-        log.info("[SYNC] 저장 완료 - 신규 저장:{}건, 변환스킵:{}건, 중복스킵(extRef):{}건, 중복스킵(title):{}건",
+        log.info(" 저장 완료 - 신규 저장:{}건, 변환스킵:{}건, 중복스킵(extRef):{}건, 중복스킵(title):{}건",
                 success, skipped, skippedDupExt, skippedDupTitle);
 
         return saved.stream()
@@ -130,4 +130,10 @@ public class AdminServiceImpl implements AdminService{
                 .collect(Collectors.toList());
 
     }
+
+
+    // 추천 창업 지원사업 생성
+
+
+
 }
