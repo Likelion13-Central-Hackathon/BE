@@ -81,7 +81,7 @@ public class ReportServiceImpl implements ReportService {
         // 3. 지원사업 생성
         // 제목+내용 유사도 상위 K개 요청
         List<SimilarSupport> similarSupports =
-                similarSupportClient.getTopKSims("", idea.getDescription(), 50); //idea.getTitle()
+                similarSupportClient.getTopKSims("", idea.getDescription(), 100); //idea.getTitle()
         if (similarSupports == null || similarSupports.isEmpty()) {
             log.debug("유사도 상위 k개 요청 반환값 비어있음");
             throw new RecommendedStartupSupportCreatedException();
