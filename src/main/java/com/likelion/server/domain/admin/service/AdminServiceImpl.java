@@ -33,7 +33,7 @@ public class AdminServiceImpl implements AdminService{
     @Transactional
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     public List<StartupSupportResponse> syncLatestStartupSupports() {
-        String syncUrl = apiBaseUrl + "/api/startup-supports";
+        String syncUrl = apiBaseUrl + "/ai/startup-supports";
 
         // 1. 가장 최근 startupSupport의 externalRef (없으면 null)
         String cursor = supportRepository.findTopByOrderByIdDesc()

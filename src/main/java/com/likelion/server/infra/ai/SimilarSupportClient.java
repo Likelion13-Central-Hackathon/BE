@@ -25,7 +25,7 @@ public class SimilarSupportClient {
     // 유사도 상위 K개 요청 메서드
     public List<SimilarSupport> getTopKSims(String ideaTitle, String ideaDescription, int k) {
         int topK = Math.max(1, Math.min(100, k)); // 최소1, 최대 100으로 제한
-        String url = apiBaseUrl + "/api/similar?k=" + topK;
+        String url = apiBaseUrl + "/ai/similar?k=" + topK;
 
         // 요청 세팅
         RestTemplate restTemplate = new RestTemplate();
