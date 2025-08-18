@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AdminServiceImpl implements AdminService{
     private final StartupSupportRepository supportRepository;
+    private final RestTemplate restTemplate;
 
     @Value("${fastapi.base-url}")
     private String apiBaseUrl;
@@ -41,7 +42,6 @@ public class AdminServiceImpl implements AdminService{
                 .orElse(null);
 
         // 2. 로컬 서버 통신을 위한 준비
-        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

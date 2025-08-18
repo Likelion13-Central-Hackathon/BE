@@ -18,6 +18,7 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class SimilarSupportClient {
+    private final RestTemplate restTemplate;
 
     @Value("${fastapi.base-url}")
     private String apiBaseUrl;
@@ -28,7 +29,6 @@ public class SimilarSupportClient {
         String url = apiBaseUrl + "/ai/similar?k=" + topK;
 
         // 요청 세팅
-        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
