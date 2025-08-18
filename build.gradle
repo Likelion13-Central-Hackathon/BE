@@ -47,6 +47,9 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+	// Http
+	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+
 }
 
 tasks.named('test') {
