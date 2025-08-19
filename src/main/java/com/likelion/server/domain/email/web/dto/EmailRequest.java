@@ -13,5 +13,7 @@ public record EmailRequest(
         String password,
 
         @NotNull
-        Long ideaId
+        Long ideaId,
+
+        Boolean isEnrolled
 ) {}
