@@ -64,20 +64,42 @@ public class ReportGeneratorImpl implements ReportGenerator {
         }
         String researchMethod = researchMethodBuilder.toString().trim();
 
+        
         // 2) SWOT
         String swotPrompt = """
-            다음 아이디어에 대해 SWOT 분석을 해주세요.
-            각 항목을 'Strength: ...', 'Weakness: ...', 'Opportunity: ...', 'Threat: ...' 형식으로 한 줄씩 작성해주세요.
-
+            다음 아이디어에 대해 맞춤형 SWOT 분석을 해주세요.  
+            - 각 항목은 반드시 'Strength:', 'Weakness:', 'Opportunity:', 'Threat:' 형식으로 시작하세요.  
+            - 각 항목은 **개조식(bullet point)**으로 2~3개 항목 정도 작성하고, 실제 창업자가 공감할 수 있도록 아이디어의 맥락과 시장 상황을 반영하세요.  
+            - 너무 일반적인 문구(예: "시장이 크다")는 피하고, **아이디어만의 특성을 짚어주는 구체적인 인사이트**를 주세요.  
+        
+            [출력 형식 예시]
+            Strength:
+            - 지역 밀착형 거래 문화로 신뢰 확보 용이
+            - “내 주변에서 바로 해결” 경험 → 차별성 강화
+        
+            Weakness:
+            - 초기 거래 데이터 부족 → 추천 정확도 낮음
+            - 지역 단위가 좁으면 이용자 풀이 제한됨
+        
+            Opportunity:
+            - GPT-5, Claude 3.5 등 신형 AI 활용 → 대화형 상담·검색 강화 가능
+            - MZ세대의 지역 커뮤니티 참여 활발 → 빠른 확산 기회
+        
+            Threat:
+            - 당근마켓·번개장터 등 경쟁사 이미 광고·추천 고도화
+            - “또 하나의 중고 앱” 인식 시 차별성 약화
+        
             아이디어 정보:
             %s
         """.formatted(ideaText);
+        
         String swotResponse = gptChatService.chatSinglePrompt(swotPrompt);
-        String strength   = parseLine(swotResponse, "Strength");
-        String weakness   = parseLine(swotResponse, "Weakness");
-        String opportunity= parseLine(swotResponse, "Opportunity");
-        String threat     = parseLine(swotResponse, "Threat");
+        String strength    = parseLine(swotResponse, "Strength");
+        String weakness    = parseLine(swotResponse, "Weakness");
+        String opportunity = parseLine(swotResponse, "Opportunity");
+        String threat      = parseLine(swotResponse, "Threat");
 
+        
         // 3) 실행 계획 + 기대효과
         String planPrompt = """
             다음 아이디어에 대해 4단계 실행 계획과 기대효과를 작성해주세요.
