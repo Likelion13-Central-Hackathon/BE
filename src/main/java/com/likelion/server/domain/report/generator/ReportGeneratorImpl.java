@@ -102,17 +102,41 @@ public class ReportGeneratorImpl implements ReportGenerator {
         
         // 3) 실행 계획 + 기대효과
         String planPrompt = """
-            다음 아이디어에 대해 4단계 실행 계획과 기대효과를 작성해주세요.
-            각 항목은 아래 형식을 지켜주세요:
-            Step1: ...
-            Step2: ...
-            Step3: ...
-            Step4: ...
-            ExpectedEffect: ...
-
-            아이디어 정보:
+            다음 아이디어에 대해 **맞춤형 실행 계획 (나만의 성공 로드맵⛳)**을 작성해주세요.  
+        
+            - 각 단계 제목([리서치 & 아이디어 검증], [MVP 제작 & 초기 시장 테스트], [정식 론칭 준비 & 마케팅], [스케일업 & 투자 준비])은 이미 주어져 있으니 출력하지 마세요.  
+            - 각 단계마다 실행 포인트를 **개조식으로 2줄 정도** 작성하세요.  
+            - 내용은 단순한 일반론이 아니라, 입력된 아이디어의 맥락에 맞춘 **개인화된 실행 제안**이 되어야 합니다.  
+              (예: 특정 대상 고객군, 예상되는 사용자 반응, 최근 나온 AI/서비스 활용 등)  
+            - 톤은 마치 멘토가 조언하는 것처럼, **실행자가 바로 행동에 옮길 수 있게** 작성하세요.  
+            - ExpectedEffect는 해당 아이디어가 성공했을 때 예상되는 핵심 성과를 2줄 정도로 작성하세요.  
+        
+            [출력 형식 예시]
+        
+            Step1:  
+            - 고객 문제 정의를 위해 실제 타겟층 10명을 인터뷰 (예: 대학생/직장인 구분)  
+            - JTBD 프레임워크로 핵심 불편 포인트 도출  
+        
+            Step2:  
+            - 핵심 가설(예: “지역 기반 추천이 전환율을 높인다”)을 검증할 MVP 제작  
+            - 소규모 커뮤니티(카페/오픈채팅)에서 초기 반응 테스트  
+        
+            Step3:  
+            - 초기 사용자 피드백 반영해 기능 고도화  
+            - SNS·커뮤니티 중심으로 저비용 마케팅 캠페인 집행  
+        
+            Step4:  
+            - 가격 정책 실험과 전환 퍼널 점검으로 수익성 모델 확인  
+            - 엔젤 투자자 대상으로 피치덱 공유 및 미팅 추진  
+        
+            ExpectedEffect:  
+            - 초기 고객군의 문제 검증과 충성 사용자 확보  
+            - 투자 유치 가능성과 확장 전략에 대한 확신 강화  
+        
+            아이디어 정보:  
             %s
         """.formatted(ideaText);
+        
         String planResponse = gptChatService.chatSinglePrompt(planPrompt);
         String step1 = parseLine(planResponse, "Step1");
         String step2 = parseLine(planResponse, "Step2");
@@ -120,6 +144,7 @@ public class ReportGeneratorImpl implements ReportGenerator {
         String step4 = parseLine(planResponse, "Step4");
         String expectedEffect = parseLine(planResponse, "ExpectedEffect");
 
+        
         // 4) Report 엔티티 생성
         return Report.builder()
                 .idea(idea)
