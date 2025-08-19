@@ -5,7 +5,6 @@ import com.likelion.server.domain.report.entity.Report;
 import com.likelion.server.infra.gpt.GptChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
@@ -94,10 +93,10 @@ public class ReportGeneratorImpl implements ReportGenerator {
         """.formatted(ideaText);
         
         String swotResponse = gptChatService.chatSinglePrompt(swotPrompt);
-        String strength    = parseLine(swotResponse, "Strength");
-        String weakness    = parseLine(swotResponse, "Weakness");
-        String opportunity = parseLine(swotResponse, "Opportunity");
-        String threat      = parseLine(swotResponse, "Threat");
+        String strength    = parseBlock(swotResponse, "Strength");
+        String weakness    = parseBlock(swotResponse, "Weakness");
+        String opportunity = parseBlock(swotResponse, "Opportunity");
+        String threat      = parseBlock(swotResponse, "Threat");
 
         
         // 3) 실행 계획 + 기대효과
@@ -138,11 +137,11 @@ public class ReportGeneratorImpl implements ReportGenerator {
         """.formatted(ideaText);
         
         String planResponse = gptChatService.chatSinglePrompt(planPrompt);
-        String step1 = parseLine(planResponse, "Step1");
-        String step2 = parseLine(planResponse, "Step2");
-        String step3 = parseLine(planResponse, "Step3");
-        String step4 = parseLine(planResponse, "Step4");
-        String expectedEffect = parseLine(planResponse, "ExpectedEffect");
+        String step1 = parseBlock(planResponse, "Step1");
+        String step2 = parseBlock(planResponse, "Step2");
+        String step3 = parseBlock(planResponse, "Step3");
+        String step4 = parseBlock(planResponse, "Step4");
+        String expectedEffect = parseBlock(planResponse, "ExpectedEffect");
 
         
         // 4) Report 엔티티 생성
@@ -162,13 +161,21 @@ public class ReportGeneratorImpl implements ReportGenerator {
                 .build();
     }
 
-    // GPT 응답 파싱 메서드
-    private String parseLine(String text, String key) {
-        return Arrays.stream(text.split("\\r?\\n"))
-                .filter(line -> line.startsWith(key + ":"))
-                .map(line -> line.replace(key + ":", "").trim())
-                .findFirst()
-                .orElse(null);
+    // 야러줄 파싱 메서드
+    private String parseBlock(String text, String key) {
+        StringBuilder sb = new StringBuilder();
+        boolean inSection = false;
+        for (String line : text.split("\\r?\\n")) {
+            if (line.startsWith(key + ":")) {
+                inSection = true;
+                sb.append(line.replace(key + ":", "").trim()).append("\n");
+            } else if (inSection && line.matches("^[A-Za-z]+:.*")) {
+                break; // 다음 key 나오면 종료
+            } else if (inSection) {
+                sb.append(line).append("\n");
+            }
+        }
+        return sb.toString().trim();
     }
 
     // null 처리 메서드
