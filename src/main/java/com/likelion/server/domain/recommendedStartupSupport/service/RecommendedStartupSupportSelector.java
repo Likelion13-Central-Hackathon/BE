@@ -26,53 +26,48 @@ public class RecommendedStartupSupportSelector {
     private final GptChatService gptChatService;
 
     // 유사도 상위 K개의 후보 → 규칙 기반 통합 점수 선정 → Top3 저장 및 GPT 이유 생성
-    public int selectAndSaveTop3(
+    public int selectAndSaveTopK(
+            int k,
             Report report,
             IdeaFullInfoDto idea,
             List<StartupSupport> supports
     ) {
-        if (supports == null || supports.isEmpty()) return 0;
-
-        final LocalDate today = LocalDate.now();
-
-        // 0) 마감 공고는 제외
-        List<StartupSupport> openOnly = new ArrayList<>();
-        for (StartupSupport s : supports) {
-            if (s == null) continue;
-            if (!isClosed(s, today)) openOnly.add(s);
-        }
-        if (openOnly.isEmpty()) return 0;
-
-        // 1) 점수화 (업력은 조건과의 통과여부 + 작은 보너스 점수만)
-        List<Scored> scored = new ArrayList<>(openOnly.size());
-        for (int rank = 0; rank < openOnly.size(); rank++) {
-            StartupSupport s = openOnly.get(rank);
-
-            // 업력 카테고리 적합성 체크(불충족 시 제외)
+        if (supports == null || supports.isEmpty() || k <= 0) return 0;
+        
+        // 0) 기존 추천 전부 삭제 
+        recommendedStartupSupportRepository.deleteByReport(report);
+        
+        // 1) 점수화
+        List<Scored> scored = new ArrayList<>(supports.size());
+        int total = supports.size();
+        for (int rank = 0; rank < total; rank++) {
+            StartupSupport s = supports.get(rank);
+    
             EligibilityResult elig = checkBusinessDurationEligibility(idea, s);
-            if (!elig.ok) continue; // 실격
-
-            double score = scoreSupport(idea, s, rank, openOnly.size(), elig.bonus /*biz bonus*/);
+            if (!elig.ok) continue; // 업력 미충족 제외하기
+    
+            double score = scoreSupport(idea, s, rank, total, elig.bonus);
             scored.add(new Scored(s, score));
         }
         if (scored.isEmpty()) return 0;
 
-        // 2) Top3
+        // 2) TopK 선정 (내림차순 정렬 → 상위 k개)
         scored.sort((a, b) -> Double.compare(b.score, a.score));
-        List<Scored> top3 = scored.subList(0, Math.min(3, scored.size()));
+        List<Scored> topK = scored.subList(0, Math.min(k, scored.size()));
 
-        // 3) 저장 + GPT 이유 구하기
+        // 3) 저장 + GPT 이유
         int saved = 0;
-        for (Scored sc : top3) {
+        for (Scored sc : topK) {
             int suitability = toPercent(sc.score);
             String reason = buildReasonSafe(idea, sc.support);
-
+    
             RecommendedStartupSupport rec = RecommendedStartupSupport.builder()
                     .report(report)
                     .startupSupport(sc.support)
                     .suitability(suitability)
                     .reason(reason)
                     .build();
+    
             recommendedStartupSupportRepository.save(rec);
             saved++;
         }
