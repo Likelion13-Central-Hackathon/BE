@@ -7,6 +7,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor (access = AccessLevel.PROTECTED)
 @NoArgsConstructor (access = AccessLevel.PROTECTED)
@@ -30,18 +31,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private AcademicStatus academicStatus; // 학적
 
-    public static User ofEmailAndPassword(String email, String password) {
-        User user = new User();
-        user.email = email;
-        user.password = password;
-
-        return user;
-    }
-
-    public User updateEmailAndPassword(String email, String password) {
+    public void updateEmailAndPassword(String email, String password) {
         this.email = email;
         this.password = password;
-
-        return this;
     }
 }
