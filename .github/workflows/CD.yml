@@ -51,4 +51,4 @@ jobs:
             
             
             echo "[3/3] Cleanup unused images..."
-            docker image prune -fㅎ
+            docker image prune -f
