@@ -20,12 +20,12 @@ public class RecommendedStartupSupport extends BaseEntity {
 
     // 추천 지원 사업 N:1 리포트
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reports_id", nullable = false)
+    @JoinColumn(name = "report_id", nullable = false)
     private Report report;
 
     // 추천 지원 사업 N:1 지원 사업
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "startup_supports_id", nullable = false)
+    @JoinColumn(name = "startup_support_id", nullable = false)
     private StartupSupport startupSupport;
 
     // 적합도(0~100)
