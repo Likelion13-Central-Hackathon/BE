@@ -18,12 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmailServiceImpl implements EmailService {
 
     private final IdeaRepository ideaRepository;
-    private final UserRepository userRepository;
-    private final ReportRepository reportRepository;
     private final MailService mailService;
-
-    @Value("${server.base-url}") // https://api.changuphalgak.com
-    private String apiBaseUrl;
 
     @Override
     @Transactional
@@ -32,21 +27,19 @@ public class EmailServiceImpl implements EmailService {
         Idea idea = ideaRepository.findById(req.ideaId())
                 .orElseThrow(IdeaNotFoundException::new);
 
-        // 2) 이메일 기준 upsert
-        User user = userRepository.findByEmail(req.email())
-                .map(u -> u.updateEmailAndPassword(req.email(), req.password()))
-                .orElseGet(() -> userRepository.save(
-                        User.ofEmailAndPassword(req.email(), req.password())
-                ));
+        // 2. 해당 아이디어에 연결된 사용자 가져옴
+        User user = idea.getUser();
+        if (user == null) {
+            throw new IllegalStateException("아이디어에 연결된 사용자가 존재하지 않습니다. ideaId: " + idea.getId());
+        }
 
-        // 3) 아이디어와 사용자 연결 + 구독 ON
-        idea.EnableNotification(user);
+        // 3. 전달받은 이메일과 비밀번호로 사용자 정보를 업데이트
+        user.updateEmailAndPassword(req.email(), req.password());
 
-        // 4) 최신 리포트가 있으면 링크
-        String reportUrl = reportRepository.findTopByIdeaIdOrderByCreatedAtDesc(idea.getId())
-                .map(r -> apiBaseUrl + "/api/reports/" + r.getId())
-                .orElse(apiBaseUrl + "/api/reports");
+        // 4. 아이디어의 알림 수신 설정 활성화(true)
+        idea.activateNotification();
 
+        // 5. 구독 확인 메일 발송
         mailService.sendSubscriptionConfirmed(user.getEmail());
     }
 }
