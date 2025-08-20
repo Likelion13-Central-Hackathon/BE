@@ -69,14 +69,14 @@ public class ReportServiceImpl implements ReportService {
 
         // 1. 생성에 필요한 Idea 데이터 가공
         IdeaFullInfoDto ideaFullInfoDto = ideaInfoAssembler.toFullInfo(idea);
-        String ideaText = ideaDescriptionFormatter.toDescription(ideaFullInfoDto);
+        String ideaFullInfoText = ideaDescriptionFormatter.toDescription(ideaFullInfoDto);
 
-        Report report = reportGenerator.generate(idea, ideaText); // 레포트 생성
+        Report report = reportGenerator.generate(idea, ideaFullInfoText); // 레포트 생성
         Report saved = reportRepository.save(report);
         log.debug("Idea 데이터 가공 완료");
 
         // 2. 뉴스 생성
-        newsGenerator.generate(report, ideaText);
+        newsGenerator.generate(report, ideaFullInfoText);
         log.debug("Report saved: {}", saved);
 
         // 3. 지원사업 생성
@@ -118,7 +118,8 @@ public class ReportServiceImpl implements ReportService {
                 3,
                 report,
                 ideaFullInfoDto,
-                startupSupports
+                startupSupports,
+                ideaFullInfoText
         );
         log.debug("저장 완료: similarSupports -> savedCnt <UNK> {}", savedCnt);
 

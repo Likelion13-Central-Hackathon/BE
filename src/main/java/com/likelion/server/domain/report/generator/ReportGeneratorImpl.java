@@ -13,38 +13,42 @@ public class ReportGeneratorImpl implements ReportGenerator {
     private final GptChatService gptChatService;
 
     @Override
-    public Report generate(Idea idea, String ideaText) {
+    public Report generate(Idea idea, String ideaFullInfoText) {
         // 1) 분석 각도 + 주간핵심제안(실태 + 리서치 방법)
         String anglePrompt = """
-            아래 아이디어에 대해 두 가지 정보를 반드시 출력하세요.  
-            아이디어: %s  
+            다음 아이디어 정보를 기반으로 **맞춤형 실행 계획 (나만의 성공 로드맵⛳)**을 작성해주세요.  
             
-            1. **분석 각도 (30~180 범위의 정수)**  
-               - 무작위가 아니라, 아이디어의 성격·시장성·기술성 등을 고려해 적절한 수치를 주석처럼 설명하지 말고 "각도:<정수>" 형식으로만 출력하세요.  
+            - 각 단계 제목([리서치 & 아이디어 검증], [MVP 제작 & 초기 시장 테스트], [정식 론칭 준비 & 마케팅], [스케일업 & 투자 준비])은 이미 주어져 있으니 출력하지 마세요.  
+            - 각 단계마다 실행 포인트를 **마크다운 문법을 사용해 개조식으로 2줄 정도** 작성하세요.  
+              (예: **볼드**로 핵심 행동 강조, *기울임*으로 주의/설명 표시)  
+            - 내용은 단순한 일반론이 아니라, 입력된 아이디어의 맥락(작성자 나이, 재학 여부, 대학/학적, 주소, 관심 분야, 업력, 창업 단계, 아이템 설명, 팀 구성원 수, 보유 자본, 필요 지원 항목, 보유 자원) 기반으로 **개인화된 실행 제안**이 되어야 합니다.  
+              (예: 특정 대상 고객군, 예상되는 사용자 반응, 최근 나온 AI/서비스 활용 등)  
+            - 톤은 마치 멘토가 조언하는 것처럼, **실행자가 바로 행동에 옮길 수 있게** 작성하세요.  
+            - ExpectedEffect는 해당 아이디어가 성공했을 때 예상되는 핵심 성과를 2줄 정도 작성해주세요.  
             
-            2. **💡 성장을 위한 주간 핵심 제안**  
-               - 아래 항목 중 최소 2개 이상을 반영하세요.  
-                 * 최근 출시된 AI/서비스 활용 아이디어 (예: "저번주에 나온 ~AI를 가지고, 네 서비스의 ~ 기능을 테스트해보라")  
-                 * 경쟁사 서비스 출시 및 SNS/커뮤니티 반응 요약 (핫한 키워드/밈/평가 포함)  
-                 * 가격·기능 차별점 정리 및 홍보 포인트 제안  
+            Step1:  
+            - 
+            - 
             
-               - 출력은 꼭 마크다운 형식으로, 뉴스 요약 보고서처럼 **간결·가독성 있게** 작성하세요.  
-               - 이모지(🤖, 🏘, 📌, 💡 등)를 적절히 포함하세요.  
+            Step2:  
+            - 
+            - 
             
-            [출력 형식 예시]
-            각도: 93  
-            주간핵심제안:  
-            📌 **최신 트렌드 & 적용 제안 요약**  
-            * 🤖 **GPT-5 출시와 반응**  
-              GPT-5가 출시되었으나 감정 표현 부족으로 사용자 반발이 있었고, OpenAI는 이를 개선해 친근한 톤으로 재조정했습니다.  
-            * 🏘 **지역 기반 거래 확대**  
-              소비자들이 지역 사회와의 연결을 중시하면서 지역 기반 중고 거래 플랫폼 수요가 늘고 있습니다.  
+            Step3:  
+            - 
+            - 
             
-            💡 **서비스 적용 방안**  
-            * GPT-5를 활용해 거래 문의 자동 응답 → 사용자 경험 향상  
-            * 위치 기반 맞춤형 상품 추천 → 지역 내 거래 활성화
+            Step4:  
+            - 
+            - 
             
-        """.formatted(ideaText);
+            ExpectedEffect:  
+            - 
+            - 
+            
+            아이디어 정보: %s
+        """.formatted(ideaFullInfoText);
+        
         String angleResponse = gptChatService.chatSinglePrompt(anglePrompt);
         Integer angle = null;
         StringBuilder researchMethodBuilder = new StringBuilder();
@@ -90,7 +94,7 @@ public class ReportGeneratorImpl implements ReportGenerator {
         
             아이디어 정보:
             %s
-        """.formatted(ideaText);
+        """.formatted(ideaFullInfoText);
         
         String swotResponse = gptChatService.chatSinglePrompt(swotPrompt);
         String strength    = parseBlock(swotResponse, "Strength");
@@ -113,28 +117,28 @@ public class ReportGeneratorImpl implements ReportGenerator {
             [출력 형식 예시]
         
             Step1:  
-            - 고객 문제 정의를 위해 실제 타겟층 10명을 인터뷰 (예: 대학생/직장인 구분)  
+            - 고객 문제 정의를 위해 실제 타겟층 10명을 인터뷰 (예: 대학생/직장인 구분)\n
             - JTBD 프레임워크로 핵심 불편 포인트 도출  
         
             Step2:  
-            - 핵심 가설(예: “지역 기반 추천이 전환율을 높인다”)을 검증할 MVP 제작  
+            - 핵심 가설(예: “지역 기반 추천이 전환율을 높인다”)을 검증할 MVP 제작\n
             - 소규모 커뮤니티(카페/오픈채팅)에서 초기 반응 테스트  
         
             Step3:  
-            - 초기 사용자 피드백 반영해 기능 고도화  
+            - 초기 사용자 피드백 반영해 기능 고도화\n
             - SNS·커뮤니티 중심으로 저비용 마케팅 캠페인 집행  
         
             Step4:  
-            - 가격 정책 실험과 전환 퍼널 점검으로 수익성 모델 확인  
+            - 가격 정책 실험과 전환 퍼널 점검으로 수익성 모델 확인\n
             - 엔젤 투자자 대상으로 피치덱 공유 및 미팅 추진  
         
             ExpectedEffect:  
-            - 초기 고객군의 문제 검증과 충성 사용자 확보  
+            - 초기 고객군의 문제 검증과 충성 사용자 확보\n
             - 투자 유치 가능성과 확장 전략에 대한 확신 강화  
         
             아이디어 정보:  
             %s
-        """.formatted(ideaText);
+        """.formatted(ideaFullInfoText);
         
         String planResponse = gptChatService.chatSinglePrompt(planPrompt);
         String step1 = parseBlock(planResponse, "Step1");
@@ -166,17 +170,24 @@ public class ReportGeneratorImpl implements ReportGenerator {
         StringBuilder sb = new StringBuilder();
         boolean inSection = false;
         for (String line : text.split("\\r?\\n")) {
+            // 현재 key 시작
             if (line.startsWith(key + ":")) {
                 inSection = true;
-                sb.append(line.replace(key + ":", "").trim()).append("\n");
-            } else if (inSection && line.matches("^[A-Za-z]+:.*")) {
-                break; // 다음 key 나오면 종료
-            } else if (inSection) {
+                String content = line.replace(key + ":", "").trim();
+                if (!content.isEmpty()) sb.append(content).append("\n");
+            } 
+            // 다음 key 나오면 종료
+            else if (inSection && line.matches("^(Step[1-4]|ExpectedEffect):.*")) {
+                break;
+            } 
+            // 현재 섹션이면 내용 추가
+            else if (inSection) {
                 sb.append(line).append("\n");
             }
         }
         return sb.toString().trim();
     }
+
 
     // null 처리 메서드
     private String nullSafe(String v) { return v != null ? v : "없음"; }

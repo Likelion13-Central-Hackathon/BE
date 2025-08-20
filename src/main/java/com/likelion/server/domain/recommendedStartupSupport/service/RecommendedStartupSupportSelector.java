@@ -30,7 +30,8 @@ public class RecommendedStartupSupportSelector {
             int k,
             Report report,
             IdeaFullInfoDto idea,
-            List<StartupSupport> supports
+            List<StartupSupport> supports,
+            String ideaFullInfoText
     ) {
         if (supports == null || supports.isEmpty() || k <= 0) return 0;
         
@@ -59,7 +60,7 @@ public class RecommendedStartupSupportSelector {
         int saved = 0;
         for (Scored sc : topK) {
             int suitability = toPercent(sc.score);
-            String reason = buildReasonSafe(idea, sc.support);
+            String reason = buildReasonSafe(ideaFullInfoText, sc.support);
     
             RecommendedStartupSupport rec = RecommendedStartupSupport.builder()
                     .report(report)
@@ -282,46 +283,75 @@ public class RecommendedStartupSupportSelector {
 
     /* ===================== GPT 이유 생성 ===================== */
 
-    private String buildReasonSafe(IdeaFullInfoDto idea, StartupSupport s) {
-        try {
-            String prompt = buildReasonPrompt(idea, s);
-            String res = gptChatService.chatSinglePrompt(prompt);
-            if (res != null && !res.isBlank()) return trimTo(res, 500);
-        } catch (Exception e) {
-            log.warn("[GPT] reason 생성 실패 extRef={}, err={}", s.getExternalRef(), e.toString());
+private String buildReasonSafe(String ideaFullInfoText, StartupSupport s) {
+    try {
+        String prompt = buildReasonPrompt(ideaFullInfoText, s);
+        String reason = gptChatService.chatSinglePrompt(prompt);
+        if (reason != null && !reason.isBlank()) {
+            return reason;
         }
-        return "아이디어의 단계·대상·지역 등 핵심 조건이 해당 지원사업과 부합하여 추천합니다.";
+    } catch (Exception e) {
+        log.warn("[GPT] reason 생성 실패 extRef={}, err={}", s.getExternalRef(), e.toString());
     }
+    return "아이디어의 단계·대상·지역 등 핵심 조건이 해당 지원사업과 부합하여 추천해요!";
+}
 
-    private String buildReasonPrompt(IdeaFullInfoDto idea, StartupSupport s) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("다음 '아이디어 정보'와 '지원사업'이 왜 잘 맞는지 한국어로 2~3문장으로 마크다운 문법을 사용해서 간단히 설명해줘.\n")
-                .append("- 과장 없이, 구체적 근거(대상 키워드/지역/업력/연령/분야 등)를 들어줘.\n\n")
 
-                .append("[아이디어 정보]\n")
-                .append("나이: ").append(idea.userAge()).append("\n")
-                .append("재학여부: ").append(idea.isEnrolled() ? "재학/휴학 중" : "비재학").append("\n")
-                .append("학교: ").append(nz(idea.university())).append("\n")
-                .append("학적상태: ").append(nz(idea.academicStatus())).append("\n")
-                .append("지역: ").append(nz(idea.addressCity())).append(" ").append(nz(idea.addressDistrict())).append("\n")
-                .append("관심분야: ").append(nz(idea.interestArea())).append("\n")
-                .append("업력(단계): ").append(nz(idea.businessAge())).append(" / ").append(nz(idea.stage())).append("\n")
-                .append("팀/자본: ").append(nz(idea.teamSize())).append(" / ").append(nz(idea.capital())).append("\n")
-                .append("아이디어 설명: ").append(nz(idea.description())).append("\n\n")
+private String buildReasonPrompt(String ideaFullInfoText, StartupSupport s) {
+    return String.format("""
+            당신은 '창업 지원사업 추천 사유'를 작성하는 **전문가**이자, 동시에 귀엽게 설명하는 *서포터*입니다.  
+            이미 선택된 지원사업이 왜 이 아이디어와 잘 맞는지, 아래 정보를 바탕으로 **최대한 적합한 근거**를 찾아 **한국어로 2~3문장**으로만 답하세요.
+            
+            말투 & 톤:
+            - 모든 문장은 **반말**로 쓸 것 (존댓말 금지).
+            - 끝맺음은 "~할각?", "~좋을듯!", "~어때?"처럼 귀엽고 부드러운 의문/제안조 반말로.
+            - **부적합** 금지 → 항상 **당신의 창업 아이템과 맞는 근거**를 찾아 말할 것.
+            - 답변에 이모지(⚡📐🔍🥇🧾💡) 중 1~2개 사용.
+            - 마크다운(굵게, *이탤릭*, `인라인`) 사용 가능.
+            
+            내용 규칙:
+            - 먼저 **당신의 창업 아이템과 어떤 점이 맞는지**(지원분야/지역/업력/연령/모집기간/대상 등)를 구체적으로 제시.
+            - 맞지 않는 부분은 "이렇게 보완하면 더 좋을듯!" 형태로 간단히 제안.
+            - 총 2~3문장만.
 
-                .append("[지원사업]\n")
-                .append("제목: ").append(nz(s.getTitle())).append("\n")
-                .append("지원분야: ").append(nz(s.getSupportArea())).append("\n")
-                .append("지역: ").append(nz(RegionMapper.toString(s.getRegion()))).append("\n")
-                .append("업력 대상: ").append(nz(s.getBusinessDuration())).append("\n")
-                .append("연령 제한: ").append(nz(s.getTargetAge())).append("\n")
-                .append("모집기간: ").append(dateRange(s)).append("\n")
-                .append("지원대상 전문: ").append("\n")
-                .append(nz(s.getTarget())).append("\n\n")
+            
+            [아이디어 정보]
+            %s
+            
+            [지원사업]
+            제목: %s
+            지원분야: %s
+            지역: %s
+            업력 대상: %s
+            연령 제한: %s
+            모집기간: %s
+            지원대상 전문: %s
+            
+            출력 예시 1:
+            너의 창업 아이템이 *지원분야(디지털 전환)/지역(서울)*이랑 딱 맞고, 모집기간 내에 신청하면 충분히 경쟁력 있을 것 같아🥇. 특히 청년 창업 우대 조건까지 부합해서 가점 노려볼 수 있겠는걸.
+            다만 업력 실적이 조금 부족해 보여서, 협력사 레퍼런스나 기존 프로젝트 성과 자료를 보완하면 더 설득력 있게 어필할 수 있을각📐.
 
-                .append("출력: 2~3문장으로 핵심 근거만 요약.");
-        return sb.toString();
-    }
+            출력 예시 2:
+            당신의 창업 아이템과 지원분야(바이오/헬스케어), 업력(예비창업) 요건이 잘 맞네💡. 모집기간 안에 비즈니스 모델 캔버스랑 간단한 시제품 자료만 정리하면 심사위원 설득하기 좋을듯!
+            시장성 자료가 조금 약한 편이니까, 파일럿 테스트 데이터나 타겟 고객 인터뷰 결과를 보강해서 제출하면 완전 든든할각⚡. 같이 준비해보자!
+
+            주의:
+            - 불필요한 수식어/장황한 서론 금지.  
+            - 주어진 필드 밖 정보 **추측 금지**.  
+            - 출력에는 위의 대괄호 섹션을 **복사하지 말 것**.
+        """,
+        ideaFullInfoText,
+        nz(s.getTitle()),
+        nz(s.getSupportArea()),
+        nz(RegionMapper.toString(s.getRegion())),
+        nz(s.getBusinessDuration()),
+        nz(s.getTargetAge()),
+        dateRange(s),
+        nz(s.getTarget())
+    );
+}
+
+
 
     private String dateRange(StartupSupport s) {
         var st = s.getStartDate(); var ed = s.getEndDate();
