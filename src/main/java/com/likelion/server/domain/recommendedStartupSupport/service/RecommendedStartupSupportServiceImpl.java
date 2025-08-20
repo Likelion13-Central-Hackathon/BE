@@ -35,8 +35,8 @@ public class RecommendedStartupSupportServiceImpl implements RecommendedStartupS
                         s.getStartupSupport().getSupportArea(),
                         s.getStartupSupport().getTitle(),
                         s.getStartupSupport().getAgency(),
-                        s.formatYmd(s.getStartupSupport().getStartDate()),
-                        s.formatYmd(s.getStartupSupport().getEndDate())
+                        s.formatMd(s.getStartupSupport().getStartDate()), // LocalDate -> Strint(mm.dd)
+                        s.formatMd(s.getStartupSupport().getEndDate()) // LocalDate -> Strint(mm.dd)
                 ))
                 .toList();
     }
