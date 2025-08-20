@@ -8,6 +8,7 @@ import com.likelion.server.domain.idea.support.IdeaInfoAssembler;
 import com.likelion.server.domain.idea.web.dto.IdeaFullInfoDto;
 import com.likelion.server.domain.recommendedStartupSupport.entity.RecommendedStartupSupport;
 import com.likelion.server.domain.recommendedStartupSupport.exception.RecommendedStartupSupportCreatedException;
+import com.likelion.server.domain.recommendedStartupSupport.exception.NoValidRecommendedStartupSupportException;
 import com.likelion.server.domain.recommendedStartupSupport.service.RecommendedStartupSupportSelector;
 import com.likelion.server.infra.ai.dto.SimilarSupport;
 import com.likelion.server.domain.report.entity.Report;
@@ -122,7 +123,7 @@ public class ReportServiceImpl implements ReportService {
         log.debug("저장 완료: similarSupports -> savedCnt <UNK> {}", savedCnt);
 
         if (savedCnt == 0) {
-            throw new RecommendedStartupSupportCreatedException(); // 필터 후 0개인 경우
+            throw new NoValidRecommendedStartupSupportException(); // 필터 후 0개인 경우
         }
 
         return new ReportCreateResponse(saved.getId());
