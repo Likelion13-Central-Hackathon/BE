@@ -64,7 +64,6 @@ public class Idea extends BaseEntity {
                 .build();
     }
 
-    // 알림 활성화 기능만 명확히 수행하는 메서드
     public void activateNotification() {
         this.receiveNotification = true;
     }

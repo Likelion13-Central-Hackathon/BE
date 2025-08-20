@@ -39,7 +39,7 @@ public class WeeklyReportScheduler {
         var user = idea.getUser();
         String to = user.getEmail();
 
-        // 혹시라도 동일 조합에 더 최신 아이디어가 있으면 그쪽 링크로 보냄
+        // 동일 조합에 더 최신 아이디어가 있으면 그쪽 링크로 보냄
         Idea latestByCredentials = ideaRepository
                 .findTopLatestByCredentials(user.getEmail(), user.getPassword())
                 .orElse(idea);
