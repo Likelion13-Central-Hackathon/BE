@@ -113,9 +113,9 @@ public class ReportServiceImpl implements ReportService {
         }
         log.debug("similarSupports -> startupSupports 성공");
 
-        // 최종 상위 2개 선발 및 RecommendedStartupSupport 저장
+        // 최종 상위 3개 선발 및 RecommendedStartupSupport 저장
         int savedCnt = recommendedStartupSupportSelector.selectAndSaveTopK(
-                2,
+                3,
                 report,
                 ideaFullInfoDto,
                 startupSupports
