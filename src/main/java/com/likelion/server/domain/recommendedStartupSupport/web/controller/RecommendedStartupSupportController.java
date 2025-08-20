@@ -2,7 +2,6 @@ package com.likelion.server.domain.recommendedStartupSupport.web.controller;
 
 import com.likelion.server.domain.recommendedStartupSupport.service.RecommendedStartupSupportService;
 import com.likelion.server.domain.recommendedStartupSupport.web.dto.RecommendedStartupSupportDetailResponse;
-import com.likelion.server.domain.recommendedStartupSupport.web.dto.RecommendedStartupSupportSummaryResponse;
 import com.likelion.server.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,7 @@ public class RecommendedStartupSupportController {
 
     // 레포트 기반 추천 창업 지원사업 조회
     @GetMapping("/reports/{reportId}/recommendations")
-    public SuccessResponse<List<RecommendedStartupSupportSummaryResponse>> getByReportId(
+    public SuccessResponse<List<RecommendedStartupSupportDetailResponse>> getByReportId(
             @PathVariable Long reportId
     ) {
         return SuccessResponse.ok(
