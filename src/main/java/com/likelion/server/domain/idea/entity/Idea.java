@@ -22,6 +22,7 @@ public class Idea extends BaseEntity {
     private Long id;
     // User 1:N Idea
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
     // 사업장 주소(시/도)
     private String addressCity;
@@ -63,8 +64,7 @@ public class Idea extends BaseEntity {
                 .build();
     }
 
-    public void EnableNotification(User user) {
-        this.user = user;
+    public void activateNotification() {
         this.receiveNotification = true;
     }
 }

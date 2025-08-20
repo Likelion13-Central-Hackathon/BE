@@ -19,14 +19,14 @@ public class WeeklyReportScheduler {
     private final ReportRepository reportRepository;
     private final MailService mailService;
 
-    @Value("${server.base-url}")
+    @Value("${fastapi.base-url}")
     private String apiBaseUrl;
 
     // 매주 월요일 09:00 (KST)
     @Scheduled(cron = "0 0 9 * * MON", zone = "Asia/Seoul")
     @Transactional(readOnly = true)
     public void sendWeekly() {
-        for (Idea idea : ideaRepository.findAllSubscribed()) {
+        for (Idea idea : ideaRepository.findLatestIdeasForSubscribedCredentials()) {
             var user = idea.getUser();
             if (user == null || user.getEmail() == null || user.getEmail().isBlank()) continue;
 
@@ -36,8 +36,18 @@ public class WeeklyReportScheduler {
     }
 
     private void sendOne(Idea idea, Report report) {
-        String to = idea.getUser().getEmail();
-        String reportUrl = apiBaseUrl + "/api/reports/" + report.getId();
+        var user = idea.getUser();
+        String to = user.getEmail();
+
+        // 동일 조합에 더 최신 아이디어가 있으면 그쪽 링크로 보냄
+        Idea latestByCredentials = ideaRepository
+                .findTopLatestByCredentials(user.getEmail(), user.getPassword())
+                .orElse(idea);
+
+        String reportUrl = reportRepository
+                .findTopByIdeaIdOrderByCreatedAtDesc(latestByCredentials.getId())
+                .map(r -> apiBaseUrl + "/api/reports/" + r.getId())
+                .orElse(apiBaseUrl + "/api/reports");
 
         mailService.sendWeeklyReport(to, reportUrl);
     }

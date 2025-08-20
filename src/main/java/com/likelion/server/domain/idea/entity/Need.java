@@ -16,6 +16,7 @@ public class Need {
     private Long id;
     // Idea 1:N Need
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idea_id")
     private Idea idea;
     // 지원 항목명
     @Enumerated(EnumType.STRING)
