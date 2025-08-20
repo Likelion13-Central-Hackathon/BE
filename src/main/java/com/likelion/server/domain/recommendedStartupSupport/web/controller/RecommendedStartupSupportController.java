@@ -24,7 +24,7 @@ public class RecommendedStartupSupportController {
     }
 
     // 레포트 기반 추천 창업 지원사업 조회
-    @GetMapping("/report/{reportId}/recommendations")
+    @GetMapping("/reports/{reportId}/recommendations")
     public SuccessResponse<List<RecommendedStartupSupportSummaryResponse>> getByReportId(
             @PathVariable Long reportId
     ) {
