@@ -283,15 +283,15 @@ public class RecommendedStartupSupportSelector {
 
     /* ===================== GPT 이유 생성 ===================== */
 
-    private String buildReasonSafe(IdeaFullInfoDto idea, StartupSupport s) {
+    private String buildReasonSafe(String ideaFullInfoText, StartupSupport s) {
         try {
-            String prompt = buildReasonPrompt(idea, s);
-            String res = gptChatService.chatSinglePrompt(prompt);
-            if (res != null && !res.isBlank()) return trimTo(res, 500);
+            String prompt = buildReasonPrompt(ideaFullInfoText, s);
+            String reason = gptChatService.chatSinglePrompt(prompt);
+            if (res != null && !res.isBlank()) return res;
         } catch (Exception e) {
             log.warn("[GPT] reason 생성 실패 extRef={}, err={}", s.getExternalRef(), e.toString());
         }
-        return "아이디어의 단계·대상·지역 등 핵심 조건이 해당 지원사업과 부합하여 추천합니다.";
+        return "아이디어의 단계·대상·지역 등 핵심 조건이 해당 지원사업과 부합하여 추천해요!";
     }
 
 private String buildReasonPrompt(String ideaFullInfoText, StartupSupport s) {
