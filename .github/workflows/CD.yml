@@ -43,9 +43,12 @@ jobs:
             docker rm be || true
             docker run -d --name be \
               --env-file /home/${{ secrets.SSH_USER }}/.env \
+              -v /etc/localtime:/etc/localtime:ro \
+              -v /etc/timezone:/etc/timezone:ro \
+              -e TZ=Asia/Seoul \
               -p 8080:8080 \
               ${{ env.IMAGE }}:latest
             
             
             echo "[3/3] Cleanup unused images..."
-            docker image prune -f
+            docker image prune -fㅎ
