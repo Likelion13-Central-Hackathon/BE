@@ -118,7 +118,8 @@ public class ReportServiceImpl implements ReportService {
                 3,
                 report,
                 ideaFullInfoDto,
-                startupSupports
+                startupSupports,
+                ideaFullInfoText
         );
         log.debug("저장 완료: similarSupports -> savedCnt <UNK> {}", savedCnt);
 
