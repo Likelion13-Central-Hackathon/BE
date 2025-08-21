@@ -15,7 +15,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
-
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,14 +42,33 @@ public class AdminServiceImpl implements AdminService{
                 .map(StartupSupport::getExternalRef)
                 .orElse(null);
 
-        // 2. 로컬 서버 통신을 위한 준비
+        // 2. 마감일 지난 건 isRecruiting=false로 변경
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        int closed = supportRepository.closeRecruitingBefore(today); // endDate < today인 모든 건 처리
+        if (closed > 0) {
+            log.info("지원 사업 마감 처리: {}건 isRecruiting=false", closed);
+        }
+        
+        // 3. isRecruiting=false 항목 externalRef 수집 후 삭제
+        List<String> expiredExternalRefs = supportRepository
+                .findAllByIsRecruitingFalseAndExternalRefIsNotNull() // 모집 종료이고 externalRef 있는 모든 StartupSupport 반환 
+                .stream()
+                .map(StartupSupport::getExternalRef)
+                .filter(StringUtils::hasText) // 빈 문자열 방지
+                .toList();
+
+        if (!expiredExternalRefs.isEmpty()) {
+            supportRepository.deleteAllByIsRecruitingFalse();
+            log.info("모집 종료 데이터 삭제: {}건", expiredExternalRefs.size());
+        }
+        
+        // 4. FastAPI 호출
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        StartupSupportSyncRequest payload = new StartupSupportSyncRequest(cursor);
+        StartupSupportSyncRequest payload = new StartupSupportSyncRequest(cursor, expiredExternalRefs);
         HttpEntity<StartupSupportSyncRequest> httpEntity = new HttpEntity<>(payload, headers);
 
-        // 3) POST 호출
         ResponseEntity<List<StartupSupportSyncResponse>> response;
         try {
             response = restTemplate.exchange(
@@ -59,11 +79,11 @@ public class AdminServiceImpl implements AdminService{
             );
         } catch (Exception e) {
             log.error( "FastAPI 서버 호출 실패 url={}, cursor={}, err={}", syncUrl, cursor, e.toString());
-            throw new IllegalStateException("동기화 중 통신 오류 발생", e);
+            throw new IllegalStateException("FastAPI 서버 호출 실패. 통신 오류 발생", e);
         }
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new IllegalStateException("동기화 실패: " + response.getStatusCode());
+            throw new IllegalStateException("FastAPI 응답 상태코드 2xx 아님 실패: " + response.getStatusCode());
         }
 
         List<StartupSupportSyncResponse> incoming = response.getBody();
@@ -72,10 +92,10 @@ public class AdminServiceImpl implements AdminService{
             return null; // 신규 없음
         }
 
-        // 4. 저장
+        // 5. 저장
         int success = 0, skipped = 0, skippedDupExt = 0, skippedDupTitle = 0;
 
-        // 같은 배치 안에서도 중복 금지
+        // 중복 처리
         Set<String> batchExtRefs = new HashSet<>();
         Set<String> batchTitles  = new HashSet<>();
 
@@ -99,15 +119,8 @@ public class AdminServiceImpl implements AdminService{
                         continue;
                     }
                 } else if (StringUtils.hasText(title)) {
-                    // extRef 없을 때(openAPI 응답에 포함 x)는 title로 보조 중복 체크
-                    if (!batchTitles.add(title)) {
-                        skippedDupTitle++;
-                        continue;
-                    }
-                    if (supportRepository.existsByTitle(title)) {
-                        skippedDupTitle++;
-                        continue;
-                    }
+                    skippedDupTitle++;
+                    continue;
                 }
 
                 // 2) 엔티티 변환 및 추가
@@ -130,10 +143,5 @@ public class AdminServiceImpl implements AdminService{
                 .collect(Collectors.toList());
 
     }
-
-
-    // 추천 창업 지원사업 생성
-
-
 
 }
