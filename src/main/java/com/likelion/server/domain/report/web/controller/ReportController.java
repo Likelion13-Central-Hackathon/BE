@@ -22,7 +22,7 @@ public class ReportController {
     private final RecommendedStartupSupportService recommendedStartupSupportService;
 
     // 최근 리포트 상세 조회
-    @GetMapping("/latest")
+    @PostMapping("/latest")
     public SuccessResponse<ReportDetailResponse> getLatestReport(
             @RequestBody @Valid LatestReportDetailRequest request
     ) {
