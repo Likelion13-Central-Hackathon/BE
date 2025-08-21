@@ -42,7 +42,8 @@ public class AnswerServiceImpl implements AnswerService {
                - 굵은 글씨, 기울임, 마크다운 등 서식 표시는 사용하지 마세요.
                - 평문으로만 작성하세요.
                - 시장성/차별점/실행계획/근거/지표를 보완 문장으로 제시
-               - 600~900자 내외
+               - 분량은 사용자 답변과 비슷하게 만드세요.
+               - 줄바꿈은 사용하지 마세요.
                """.formatted(number, title);
     }
 }
