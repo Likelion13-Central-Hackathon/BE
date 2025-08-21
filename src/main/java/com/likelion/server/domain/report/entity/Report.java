@@ -17,7 +17,7 @@ public class Report extends BaseEntity {
 
     // 아이디어 1:N 레포트
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ideas_id", nullable = false)
+    @JoinColumn(name = "idea_id", nullable = false)
     private Idea idea;
 
     // 분석각도

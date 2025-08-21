@@ -14,9 +14,8 @@ public class Question {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // FK: answers.id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "answers_id", nullable = false)
+    @JoinColumn(name = "answer_id", nullable = false)
     private Answer answer;
 
     // 예상 질문

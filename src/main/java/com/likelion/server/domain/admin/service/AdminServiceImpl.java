@@ -49,18 +49,15 @@ public class AdminServiceImpl implements AdminService{
             log.info("지원 사업 마감 처리: {}건 isRecruiting=false", closed);
         }
         
-        // 3. isRecruiting=false 항목 externalRef 수집 후 삭제
+        // 3. isRecruiting=false 항목 externalRef 수집
         List<String> expiredExternalRefs = supportRepository
                 .findAllByIsRecruitingFalseAndExternalRefIsNotNull() // 모집 종료이고 externalRef 있는 모든 StartupSupport 반환 
                 .stream()
                 .map(StartupSupport::getExternalRef)
                 .filter(StringUtils::hasText) // 빈 문자열 방지
                 .toList();
+        log.info("모집 종료 데이터 개수: {}건", expiredExternalRefs.size());
 
-        if (!expiredExternalRefs.isEmpty()) {
-            supportRepository.deleteAllByIsRecruitingFalse();
-            log.info("모집 종료 데이터 삭제: {}건", expiredExternalRefs.size());
-        }
         
         // 4. FastAPI 호출
         HttpHeaders headers = new HttpHeaders();
