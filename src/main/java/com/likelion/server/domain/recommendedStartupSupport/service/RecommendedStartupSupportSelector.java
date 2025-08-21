@@ -34,23 +34,36 @@ public class RecommendedStartupSupportSelector {
             String ideaFullInfoText
     ) {
         if (supports == null || supports.isEmpty() || k <= 0) return 0;
-        
-        // 0) 기존 추천 전부 삭제 
+
+        // 0) 기존 추천 전부 삭제
         recommendedStartupSupportRepository.deleteByReport(report);
-        
+
         // 1) 점수화
         List<Scored> scored = new ArrayList<>(supports.size());
         int total = supports.size();
         for (int rank = 0; rank < total; rank++) {
             StartupSupport s = supports.get(rank);
-    
+
+            // 닫힌 공고는 skip
+            if (isClosed(s, LocalDate.now())) continue;
+
             EligibilityResult elig = checkBusinessDurationEligibility(idea, s);
-            if (!elig.ok) continue; // 업력 미충족 제외하기
-    
+            if (!elig.ok) continue; // 업력 미충족 제외
+
             double score = scoreSupport(idea, s, rank, total, elig.bonus);
             scored.add(new Scored(s, score));
         }
         if (scored.isEmpty()) return 0;
+
+        // 정규화를 위한 셋팅
+        double min = Double.POSITIVE_INFINITY; // + 무한대
+        double max = Double.NEGATIVE_INFINITY; // - 무한대
+        for (Scored sc : scored) {
+            min = Math.min(min, sc.score);
+            max = Math.max(max, sc.score);
+        }
+        final int floor = 45;
+        final int ceil  = 98;
 
         // 2) TopK 선정 (내림차순 정렬 → 상위 k개)
         scored.sort((a, b) -> Double.compare(b.score, a.score));
@@ -59,16 +72,17 @@ public class RecommendedStartupSupportSelector {
         // 3) 저장 + GPT 이유
         int saved = 0;
         for (Scored sc : topK) {
-            int suitability = toPercent(sc.score);
+            double norm = (max > min) ? (sc.score - min) / (max - min) : 1.0;
+            int suitability = (int) Math.round(floor + norm * (ceil - floor));  // 55~98 사이로 나오게
             String reason = buildReasonSafe(ideaFullInfoText, sc.support);
-    
+
             RecommendedStartupSupport rec = RecommendedStartupSupport.builder()
                     .report(report)
                     .startupSupport(sc.support)
                     .suitability(suitability)
                     .reason(reason)
                     .build();
-    
+
             recommendedStartupSupportRepository.save(rec);
             saved++;
         }
@@ -171,8 +185,8 @@ public class RecommendedStartupSupportSelector {
         double bizBn  = bizBonus;                           // 0.03~0.06
 
         // 가중치 (업력 가중치 제거)
-        double wPos = 0.50;
-        double wRegion = 0.25;
+        double wPos = 0.60;
+        double wRegion = 0.22;
         double wAge = 0.10;
         double wTarget = 0.05;
 
@@ -189,7 +203,7 @@ public class RecommendedStartupSupportSelector {
 
     // 지역 가산 (전국=1.0, 불일치 패널티 없음)
     private double scoreRegion(IdeaFullInfoDto idea, StartupSupport s) {
-        if (s.getRegion() == null) return 0.6;
+        if (s.getRegion() == null) return 0.45;
         String regionKor = RegionMapper.toString(s.getRegion()); // enum: 전국, 서울, 부산, 인천 ...
         if ("전국".equals(regionKor)) return 1.0;
 
@@ -232,9 +246,10 @@ public class RecommendedStartupSupportSelector {
         return 0.0;
     }
 
+    // 연령
     private double scoreTargetAge(IdeaFullInfoDto idea, StartupSupport s) {
         String t = nz(s.getTargetAge());
-        if (t.isBlank()) return 0.6;
+        if (t.isBlank()) return 0.2;
 
         int age = idea.userAge();
         AgeRange r = parseKRAge(t);
@@ -242,12 +257,13 @@ public class RecommendedStartupSupportSelector {
 
         if (age >= r.min && age <= r.max) return 1.0;
         if (age == r.min - 1 || age == r.max + 1) return 0.7;
-        return 0.2;
+        return 0.1;
     }
 
+    // 키워드
     private double scoreTargetKeywords(IdeaFullInfoDto idea, StartupSupport s) {
         String tgt = nz(s.getTarget()).toLowerCase(Locale.ROOT);
-        if (tgt.isBlank()) return 0.5;
+        if (tgt.isBlank()) return 0.4;
 
         double score = 0.5;
 
@@ -274,31 +290,31 @@ public class RecommendedStartupSupportSelector {
         // 관심분야 vs 대상/분야 가중치
         String interest = nz(idea.interestArea()).toLowerCase(Locale.ROOT);
         if (!interest.isBlank()) {
-            if (tgt.contains(interest)) score += 0.10;
+            if (tgt.contains(interest)) score += 0.30;
             String area = nz(s.getSupportArea()).toLowerCase(Locale.ROOT);
-            if (area.contains(interest)) score += 0.10;
+            if (area.contains(interest)) score += 0.30;
         }
         return clamp01(score);
     }
 
     /* ===================== GPT 이유 생성 ===================== */
 
-private String buildReasonSafe(String ideaFullInfoText, StartupSupport s) {
-    try {
-        String prompt = buildReasonPrompt(ideaFullInfoText, s);
-        String reason = gptChatService.chatSinglePrompt(prompt);
-        if (reason != null && !reason.isBlank()) {
-            return reason;
+    private String buildReasonSafe(String ideaFullInfoText, StartupSupport s) {
+        try {
+            String prompt = buildReasonPrompt(ideaFullInfoText, s);
+            String reason = gptChatService.chatSinglePrompt(prompt);
+            if (reason != null && !reason.isBlank()) {
+                return reason;
+            }
+        } catch (Exception e) {
+            log.warn("[GPT] reason 생성 실패 extRef={}, err={}", s.getExternalRef(), e.toString());
         }
-    } catch (Exception e) {
-        log.warn("[GPT] reason 생성 실패 extRef={}, err={}", s.getExternalRef(), e.toString());
+        return "아이디어의 단계·대상·지역 등 핵심 조건이 해당 지원사업과 부합하여 추천해요!";
     }
-    return "아이디어의 단계·대상·지역 등 핵심 조건이 해당 지원사업과 부합하여 추천해요!";
-}
 
 
-private String buildReasonPrompt(String ideaFullInfoText, StartupSupport s) {
-    return String.format("""
+    private String buildReasonPrompt(String ideaFullInfoText, StartupSupport s) {
+        return String.format("""
             당신은 '창업 지원사업 추천 사유'를 작성하는 **전문가**이자, 동시에 귀엽게 설명하는 *서포터*입니다.  
             이미 선택된 지원사업이 왜 이 아이디어와 잘 맞는지, 아래 정보를 바탕으로 **최대한 적합한 근거**를 찾아 **한국어로 2~3문장**으로만 답하세요.
             
@@ -340,16 +356,16 @@ private String buildReasonPrompt(String ideaFullInfoText, StartupSupport s) {
             - 주어진 필드 밖 정보 **추측 금지**.  
             - 출력에는 위의 대괄호 섹션을 **복사하지 말 것**.
         """,
-        ideaFullInfoText,
-        nz(s.getTitle()),
-        nz(s.getSupportArea()),
-        nz(RegionMapper.toString(s.getRegion())),
-        nz(s.getBusinessDuration()),
-        nz(s.getTargetAge()),
-        dateRange(s),
-        nz(s.getTarget())
-    );
-}
+                ideaFullInfoText,
+                nz(s.getTitle()),
+                nz(s.getSupportArea()),
+                nz(RegionMapper.toString(s.getRegion())),
+                nz(s.getBusinessDuration()),
+                nz(s.getTargetAge()),
+                dateRange(s),
+                nz(s.getTarget())
+        );
+    }
 
 
 
