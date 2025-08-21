@@ -44,6 +44,6 @@ public interface StartupSupportRepository extends JpaRepository<StartupSupport, 
     List<StartupSupport> findAllByIsRecruitingFalseAndExternalRefIsNotNull();
 
     // 모집 종료된 데이터 일괄 삭제
-    void deleteAllByIsRecruitingFalse();
+    // void deleteAllByIsRecruitingFalse();
     
 }
