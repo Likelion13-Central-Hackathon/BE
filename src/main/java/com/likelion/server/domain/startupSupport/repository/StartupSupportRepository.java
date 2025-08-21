@@ -26,11 +26,10 @@ public interface StartupSupportRepository extends JpaRepository<StartupSupport, 
     Page<StartupSupport> findOpenByRegions(List<Region> regions, LocalDate today, Pageable pageable);
 
     // id 내림차순으로 가장 최근 1건
-    Optional<StartupSupport> findTopByOrderByIdDesc();
+//    Optional<StartupSupport> findTopByOrderByIdDesc();
 
     // 중복 체크
     boolean existsByExternalRef(String externalRef);
-    // boolean existsByTitle(String title);
 
     StartupSupport findByExternalRef(String externalRef);
 
@@ -43,7 +42,6 @@ public interface StartupSupportRepository extends JpaRepository<StartupSupport, 
     // 모집 종료된 데이터 중 externalRef 있는 것만 수집
     List<StartupSupport> findAllByIsRecruitingFalseAndExternalRefIsNotNull();
 
-    // 모집 종료된 데이터 일괄 삭제
-    void deleteAllByIsRecruitingFalse();
-    
+    Optional<StartupSupport> findTopByOrderByExternalRefDesc();
+
 }
