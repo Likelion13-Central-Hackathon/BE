@@ -38,9 +38,10 @@ public class AdminServiceImpl implements AdminService{
         String syncUrl = apiBaseUrl + "/ai/startup-supports";
 
         // 1. 가장 최근 startupSupport의 externalRef (없으면 null)
-        String cursor = supportRepository.findTopByOrderByIdDesc()
+        String cursor = supportRepository.findTopByOrderByExternalRefDesc()
                 .map(StartupSupport::getExternalRef)
                 .orElse(null);
+        log.info("가장 최근 지원사업 externalRef: {}", cursor);
 
         // 2. 마감일 지난 건 isRecruiting=false로 변경
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
