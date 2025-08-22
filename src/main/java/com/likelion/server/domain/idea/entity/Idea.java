@@ -37,7 +37,6 @@ public class Idea extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Stage stage;
     // 아이템 이름
-    @NotBlank(message = "아이템 이름(title)은 필수입니다.")
     private String title;
     // 아이템 설명
     @Lob
@@ -60,6 +59,7 @@ public class Idea extends BaseEntity {
                 .interestArea(req.interestArea())
                 .businessAge(req.businessAge())
                 .stage(req.stage())
+                .title(req.title())
                 .description(req.description())
                 .teamSize(req.teamSize())
                 .capital(req.capital())
