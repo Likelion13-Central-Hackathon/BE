@@ -19,6 +19,7 @@ public record IdeaFullInfoDto(
         String interestArea,
         BusinessAge businessAge,
         Stage stage,
+        String title,
         String description,
         TeamSize teamSize,
         Capital capital,
