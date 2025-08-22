@@ -26,6 +26,7 @@ public class IdeaDescriptionFormatter {
         sb.append("관심 분야: ").append(nullSafe(dto.interestArea())).append("\n");
         sb.append("업력: ").append(enumSafe(dto.businessAge())).append("\n");
         sb.append("현재 창업 단계: ").append(enumSafe(dto.stage())).append("\n");
+        sb.append("아이템 이름(서비스명): ").append(nullSafe(dto.title())).append("\n");
         sb.append("아이템 설명: ").append(nullSafe(dto.description())).append("\n");
         sb.append("팀 구성원 수: ").append(enumSafe(dto.teamSize())).append("\n");
         sb.append("보유 자본(만원): ").append(enumSafe(dto.capital())).append("\n");
