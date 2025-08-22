@@ -138,7 +138,7 @@ public class ReportServiceImpl implements ReportService {
 
         // 회원 레포트 조회
         Report report = reportRepository
-                .findByIdea_User_EmailAndIdea_User_Password(user.getEmail(), user.getPassword())
+                .findTopByIdea_User_EmailOrderByCreatedAtDesc(user.getEmail())
                 .orElseThrow(ReportNotFoundException::new);
 
         return toResponse(report);
