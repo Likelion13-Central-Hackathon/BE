@@ -5,6 +5,8 @@ import com.likelion.server.domain.report.entity.Report;
 import com.likelion.server.infra.gpt.GptChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 @Component
 @RequiredArgsConstructor
@@ -16,56 +18,57 @@ public class ReportGeneratorImpl implements ReportGenerator {
     public Report generate(Idea idea, String ideaFullInfoText) {
         // 1) 분석 각도 + 주간핵심제안(실태 + 리서치 방법)
         String anglePrompt = """
-            다음 아이디어 정보를 기반으로 **맞춤형 실행 계획 (나만의 성공 로드맵⛳)**을 작성해주세요.  
+            하단 첨부된 아이디어에 대해 두 가지 정보를 반드시 출력하세요.  
             
-            - 각 단계 제목([리서치 & 아이디어 검증], [MVP 제작 & 초기 시장 테스트], [정식 론칭 준비 & 마케팅], [스케일업 & 투자 준비])은 이미 주어져 있으니 출력하지 마세요.  
-            - 각 단계마다 실행 포인트를 **마크다운 문법을 사용해 개조식으로 2줄 정도** 작성하세요.  
-              (예: **볼드**로 핵심 행동 강조, *기울임*으로 주의/설명 표시)  
-            - 내용은 단순한 일반론이 아니라, 입력된 아이디어의 맥락(작성자 나이, 재학 여부, 대학/학적, 주소, 관심 분야, 업력, 창업 단계, 아이템 설명, 팀 구성원 수, 보유 자본, 필요 지원 항목, 보유 자원) 기반으로 **개인화된 실행 제안**이 되어야 합니다.  
-              (예: 특정 대상 고객군, 예상되는 사용자 반응, 최근 나온 AI/서비스 활용 등)  
-            - 톤은 마치 멘토가 조언하는 것처럼, **실행자가 바로 행동에 옮길 수 있게** 작성하세요.  
-            - ExpectedEffect는 해당 아이디어가 성공했을 때 예상되는 핵심 성과를 2줄 정도 작성해주세요.  
+            1. **분석 각도 (30~180 범위의 정수)**  
+               - 무작위가 아니라, 아이디어의 성격·시장성·기술성 등을 고려해 적절한 수치를 주석처럼 설명하지 말고 "각도:<정수>" 형식으로만 출력하세요.  
             
-            Step1:  
-            - 
-            - 
+            2. **💡 성장을 위한 주간 핵심 제안**  
+               - 아래 항목 중 최소 2개 이상을 반영하세요.  
+                 * 최근 출시된 AI/서비스 활용 아이디어 (예: "저번주에 나온 ~AI를 가지고, 네 서비스의 ~ 기능을 테스트해보라")  
+                 * 경쟁사 서비스 출시 및 SNS/커뮤니티 반응 요약 (핫한 키워드/밈/평가 포함)  
+                 * 가격·기능 차별점 정리 및 홍보 포인트 제안  
             
-            Step2:  
-            - 
-            - 
+               - 출력은 꼭 마크다운 형식으로, 뉴스 요약 보고서처럼 **간결·가독성 있게** 작성하세요.  
+               - 이모지(🤖, 🏘, 📌, 💡 등)를 적절히 포함하세요.  
             
-            Step3:  
-            - 
-            - 
+            [출력 형식 예시]
+            각도: 93  
+            주간핵심제안:  
+            📌 **최신 트렌드 & 적용 제안 요약**  
+            * 🤖 **GPT-5 출시와 반응**  
+              GPT-5가 출시되었으나 감정 표현 부족으로 사용자 반발이 있었고, OpenAI는 이를 개선해 친근한 톤으로 재조정했습니다.  
+            * 🏘 **지역 기반 거래 확대**  
+              소비자들이 지역 사회와의 연결을 중시하면서 지역 기반 중고 거래 플랫폼 수요가 늘고 있습니다.  
             
-            Step4:  
-            - 
-            - 
-            
-            ExpectedEffect:  
-            - 
-            - 
-            
-            아이디어 정보: %s
+            💡 **서비스 적용 방안**  
+            * GPT-5를 활용해 거래 문의 자동 응답 → 사용자 경험 향상  
+            * 위치 기반 맞춤형 상품 추천 → 지역 내 거래 활성화
+
+            아이디어 정보: %s  
         """.formatted(ideaFullInfoText);
+        String angleResponse;
+        try {
+            angleResponse = gptChatService.chatSinglePrompt(anglePrompt);
+        } catch (Exception e) {
+            angleResponse = null;
+        }
         
-        String angleResponse = gptChatService.chatSinglePrompt(anglePrompt);
-        Integer angle = null;
-        StringBuilder researchMethodBuilder = new StringBuilder();
-        boolean inResearchSection = false;
-        
-        for (String line : angleResponse.split("\\r?\\n")) {
-            if (line.startsWith("각도:")) {
-                angle = Integer.parseInt(line.replace("각도:", "").trim());
-            } else if (line.startsWith("주간핵심제안:")) {
-                inResearchSection = true;
-                // "주간핵심제안:" 뒤의 같은 줄 내용이 있다면 같이 저장
-                researchMethodBuilder.append(line.replace("주간핵심제안:", "").trim()).append("\n");
-            } else if (inResearchSection) {
-                researchMethodBuilder.append(line).append("\n");
+        int angle = 90; // 기본값은 90도
+        // 각도 파싱
+        String angleStr = parseBlockSafe(angleResponse, "각도");
+        // 유효성 검사 및 번위 검사
+        if (angleStr != null && !angleStr.isBlank()) {
+            Matcher m = Pattern.compile("(\\d{1,3})").matcher(angleStr);
+            if (m.find()) {
+                int v = Integer.parseInt(m.group(1));
+                if (v < 30) v = 30;
+                if (v > 180) v = 180;
+                angle = v;
             }
         }
-        String researchMethod = researchMethodBuilder.toString().trim();
+        // 주간 핵심 제안 파싱
+        String researchMethod = parseBlockSafe(angleResponse, "주간핵심제안");
 
         
         // 2) SWOT
@@ -97,10 +100,10 @@ public class ReportGeneratorImpl implements ReportGenerator {
         """.formatted(ideaFullInfoText);
         
         String swotResponse = gptChatService.chatSinglePrompt(swotPrompt);
-        String strength    = parseBlock(swotResponse, "Strength");
-        String weakness    = parseBlock(swotResponse, "Weakness");
-        String opportunity = parseBlock(swotResponse, "Opportunity");
-        String threat      = parseBlock(swotResponse, "Threat");
+        String strength    = parseBlockSafe(swotResponse, "Strength");
+        String weakness    = parseBlockSafe(swotResponse, "Weakness");
+        String opportunity = parseBlockSafe(swotResponse, "Opportunity");
+        String threat      = parseBlockSafe(swotResponse, "Threat");
 
         
         // 3) 실행 계획 + 기대효과
@@ -141,11 +144,11 @@ public class ReportGeneratorImpl implements ReportGenerator {
         """.formatted(ideaFullInfoText);
         
         String planResponse = gptChatService.chatSinglePrompt(planPrompt);
-        String step1 = parseBlock(planResponse, "Step1");
-        String step2 = parseBlock(planResponse, "Step2");
-        String step3 = parseBlock(planResponse, "Step3");
-        String step4 = parseBlock(planResponse, "Step4");
-        String expectedEffect = parseBlock(planResponse, "ExpectedEffect");
+        String step1 = parseBlockSafe(planResponse, "Step1");
+        String step2 = parseBlockSafe(planResponse, "Step2");
+        String step3 = parseBlockSafe(planResponse, "Step3");
+        String step4 = parseBlockSafe(planResponse, "Step4");
+        String expectedEffect = parseBlockSafe(planResponse, "ExpectedEffect");
 
         
         // 4) Report 엔티티 생성
@@ -165,29 +168,36 @@ public class ReportGeneratorImpl implements ReportGenerator {
                 .build();
     }
 
-    // 야러줄 파싱 메서드
-    private String parseBlock(String text, String key) {
+    // =============================================================================================
+    // gpt 응답 파싱 메서드
+    private String parseBlockSafe(String text, String key) {
+        if (text == null) return "";
+        String[] lines = text.split("\\r?\\n");
         StringBuilder sb = new StringBuilder();
-        boolean inSection = false;
-        for (String line : text.split("\\r?\\n")) {
-            // 현재 key 시작
-            if (line.startsWith(key + ":")) {
-                inSection = true;
-                String content = line.replace(key + ":", "").trim();
-                if (!content.isEmpty()) sb.append(content).append("\n");
-            } 
-            // 다음 key 나오면 종료
-            else if (inSection && line.matches("^(Step[1-4]|ExpectedEffect):.*")) {
-                break;
-            } 
-            // 현재 섹션이면 내용 추가
-            else if (inSection) {
-                sb.append(line).append("\n");
+        boolean in = false;
+    
+        Pattern start = Pattern.compile("^\\s*\\**\\s*" + Pattern.quote(key) + "\\s*:\\s*(.*)\\s*$");
+        Pattern nextKey = Pattern.compile("^\\s*\\**\\s*[A-Za-z]+\\d*\\s*:\\s*.*$"); // Step1, ExpectedEffect 등 포함
+    
+        for (String raw : lines) {
+            String line = raw == null ? "" : raw;
+    
+            if (!in) {
+                Matcher m = start.matcher(line);
+                if (m.find()) {
+                    in = true;
+                    String first = m.group(1).trim();
+                    if (!first.isEmpty()) sb.append(first).append("\n");
+                }
+                continue;
             }
+    
+            if (nextKey.matcher(line).find()) break;
+            sb.append(line).append("\n");
         }
+    
         return sb.toString().trim();
     }
-
 
     // null 처리 메서드
     private String nullSafe(String v) { return v != null ? v : "없음"; }
