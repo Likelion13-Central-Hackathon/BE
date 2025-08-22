@@ -180,6 +180,7 @@ public class ReportServiceImpl implements ReportService {
         // 반환
         return new ReportDetailResponse(
                 report.getId(),
+                report.getTitle(),
                 report.getAngle(),
                 report.getResearchMethod(),
                 report.getStrength(),
