@@ -13,5 +13,5 @@ public record EmailRequest(
         String password,
 
         @NotNull
-        Long ideaId
+        Long reportId
 ) {}
