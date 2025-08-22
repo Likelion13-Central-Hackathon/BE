@@ -47,24 +47,28 @@ public class ReportGeneratorImpl implements ReportGenerator {
 
             아이디어 정보: %s  
         """.formatted(ideaFullInfoText);
+        String angleResponse;
+        try {
+            angleResponse = gptChatService.chatSinglePrompt(anglePrompt);
+        } catch (Exception e) {
+            angleResponse = null;
+        }
         
-        String angleResponse = gptChatService.chatSinglePrompt(anglePrompt);
-        Integer angle = 80; // 기본 각도
-        StringBuilder researchMethodBuilder = new StringBuilder();
-        boolean inResearchSection = false;
-        
-        for (String line : angleResponse.split("\\r?\\n")) {
-            if (line.startsWith("각도:")) {
-                angle = Integer.parseInt(line.replace("각도:", "").trim());
-            } else if (line.startsWith("주간핵심제안:")) {
-                inResearchSection = true;
-                // "주간핵심제안:" 뒤의 같은 줄 내용이 있다면 같이 저장
-                researchMethodBuilder.append(line.replace("주간핵심제안:", "").trim()).append("\n");
-            } else if (inResearchSection) {
-                researchMethodBuilder.append(line).append("\n");
+        int angle = 90; // 기본값은 90도
+        // 각도 파싱
+        String angleStr = parseBlockSafe(angleResponse, "각도");
+        // 유효성 검사 및 번위 검사
+        if (angleStr != null && !angleStr.isBlank()) {
+            Matcher m = Pattern.compile("(\\d{1,3})").matcher(angleStr);
+            if (m.find()) {
+                int v = Integer.parseInt(m.group(1));
+                if (v < 30) v = 30;
+                if (v > 180) v = 180;
+                angle = v;
             }
         }
-        String researchMethod = researchMethodBuilder.toString().trim();
+        // 주간 핵심 제안 파싱
+        String researchMethod = parseBlockSafe(angleResponse, "주간핵심제안");
 
         
         // 2) SWOT
