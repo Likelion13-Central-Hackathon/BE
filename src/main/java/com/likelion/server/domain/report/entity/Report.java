@@ -14,7 +14,10 @@ import lombok.*;
 public class Report extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
+    // 아이디어 이름
+    private String title;
+    
     // 아이디어 1:N 레포트
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idea_id", nullable = false)
