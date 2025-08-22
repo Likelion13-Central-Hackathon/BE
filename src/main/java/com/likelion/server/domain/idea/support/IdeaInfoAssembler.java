@@ -37,6 +37,7 @@ public class IdeaInfoAssembler {
                 idea.getInterestArea(),
                 idea.getBusinessAge(),
                 idea.getStage(),
+                idea.getTitle(),
                 idea.getDescription(),
                 idea.getTeamSize(),
                 idea.getCapital(),

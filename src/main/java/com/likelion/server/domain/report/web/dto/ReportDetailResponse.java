@@ -4,6 +4,7 @@ import java.util.List;
 
 public record ReportDetailResponse(
         Long id,
+        String title,
         Integer angle,
         String researchMethod,
         String strength,

@@ -36,6 +36,8 @@ public class Idea extends BaseEntity {
     // 현재 창업 단계 (1~6)
     @Enumerated(EnumType.STRING)
     private Stage stage;
+    // 아이템 이름
+    private String title;
     // 아이템 설명
     @Lob
     private String description;
@@ -57,6 +59,7 @@ public class Idea extends BaseEntity {
                 .interestArea(req.interestArea())
                 .businessAge(req.businessAge())
                 .stage(req.stage())
+                .title(req.title())
                 .description(req.description())
                 .teamSize(req.teamSize())
                 .capital(req.capital())
