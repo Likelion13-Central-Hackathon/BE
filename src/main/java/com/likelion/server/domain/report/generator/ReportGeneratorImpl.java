@@ -5,6 +5,8 @@ import com.likelion.server.domain.report.entity.Report;
 import com.likelion.server.infra.gpt.GptChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 @Component
 @RequiredArgsConstructor
@@ -47,7 +49,7 @@ public class ReportGeneratorImpl implements ReportGenerator {
         """.formatted(ideaFullInfoText);
         
         String angleResponse = gptChatService.chatSinglePrompt(anglePrompt);
-        Integer angle = null;
+        Integer angle = 80; // 기본 각도
         StringBuilder researchMethodBuilder = new StringBuilder();
         boolean inResearchSection = false;
         
@@ -94,10 +96,10 @@ public class ReportGeneratorImpl implements ReportGenerator {
         """.formatted(ideaFullInfoText);
         
         String swotResponse = gptChatService.chatSinglePrompt(swotPrompt);
-        String strength    = parseBlock(swotResponse, "Strength");
-        String weakness    = parseBlock(swotResponse, "Weakness");
-        String opportunity = parseBlock(swotResponse, "Opportunity");
-        String threat      = parseBlock(swotResponse, "Threat");
+        String strength    = parseBlockSafe(swotResponse, "Strength");
+        String weakness    = parseBlockSafe(swotResponse, "Weakness");
+        String opportunity = parseBlockSafe(swotResponse, "Opportunity");
+        String threat      = parseBlockSafe(swotResponse, "Threat");
 
         
         // 3) 실행 계획 + 기대효과
@@ -138,11 +140,11 @@ public class ReportGeneratorImpl implements ReportGenerator {
         """.formatted(ideaFullInfoText);
         
         String planResponse = gptChatService.chatSinglePrompt(planPrompt);
-        String step1 = parseBlock(planResponse, "Step1");
-        String step2 = parseBlock(planResponse, "Step2");
-        String step3 = parseBlock(planResponse, "Step3");
-        String step4 = parseBlock(planResponse, "Step4");
-        String expectedEffect = parseBlock(planResponse, "ExpectedEffect");
+        String step1 = parseBlockSafe(planResponse, "Step1");
+        String step2 = parseBlockSafe(planResponse, "Step2");
+        String step3 = parseBlockSafe(planResponse, "Step3");
+        String step4 = parseBlockSafe(planResponse, "Step4");
+        String expectedEffect = parseBlockSafe(planResponse, "ExpectedEffect");
 
         
         // 4) Report 엔티티 생성
@@ -162,29 +164,36 @@ public class ReportGeneratorImpl implements ReportGenerator {
                 .build();
     }
 
-    // 야러줄 파싱 메서드
-    private String parseBlock(String text, String key) {
+    // =============================================================================================
+    // gpt 응답 파싱 메서드
+    private String parseBlockSafe(String text, String key) {
+        if (text == null) return "";
+        String[] lines = text.split("\\r?\\n");
         StringBuilder sb = new StringBuilder();
-        boolean inSection = false;
-        for (String line : text.split("\\r?\\n")) {
-            // 현재 key 시작
-            if (line.startsWith(key + ":")) {
-                inSection = true;
-                String content = line.replace(key + ":", "").trim();
-                if (!content.isEmpty()) sb.append(content).append("\n");
-            } 
-            // 다음 key 나오면 종료
-            else if (inSection && line.matches("^(Step[1-4]|ExpectedEffect):.*")) {
-                break;
-            } 
-            // 현재 섹션이면 내용 추가
-            else if (inSection) {
-                sb.append(line).append("\n");
+        boolean in = false;
+    
+        Pattern start = Pattern.compile("^\\s*\\**\\s*" + Pattern.quote(key) + "\\s*:\\s*(.*)\\s*$");
+        Pattern nextKey = Pattern.compile("^\\s*\\**\\s*[A-Za-z]+\\d*\\s*:\\s*.*$"); // Step1, ExpectedEffect 등 포함
+    
+        for (String raw : lines) {
+            String line = raw == null ? "" : raw;
+    
+            if (!in) {
+                Matcher m = start.matcher(line);
+                if (m.find()) {
+                    in = true;
+                    String first = m.group(1).trim();
+                    if (!first.isEmpty()) sb.append(first).append("\n");
+                }
+                continue;
             }
+    
+            if (nextKey.matcher(line).find()) break;
+            sb.append(line).append("\n");
         }
+    
         return sb.toString().trim();
     }
-
 
     // null 처리 메서드
     private String nullSafe(String v) { return v != null ? v : "없음"; }
