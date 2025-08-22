@@ -39,6 +39,10 @@ public record CreateIdeaRequest(
         @NotNull(message = "stage는 필수 입력 값입니다.")
         Stage stage,
 
+        // 창업 아이템 이름
+        @NotBlank(message = "title은 필수 입력 값입니다.")
+        String title,
+        
         // 창업 아이템 설명
         @NotBlank(message = "description은 필수 입력 값입니다.")
         String description,
