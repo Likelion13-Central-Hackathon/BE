@@ -36,6 +36,9 @@ public class Idea extends BaseEntity {
     // 현재 창업 단계 (1~6)
     @Enumerated(EnumType.STRING)
     private Stage stage;
+    // 아이템 이름
+    @NotBlank(message = "아이템 이름(title)은 필수입니다.")
+    private String title;
     // 아이템 설명
     @Lob
     private String description;
