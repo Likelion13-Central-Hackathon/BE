@@ -15,7 +15,7 @@ public class ReportGeneratorImpl implements ReportGenerator {
     private final GptChatService gptChatService;
 
     @Override
-    public Report generate(Idea idea, String ideaFullInfoText) {
+    public Report generate(Idea idea, String ideaFullInfoText, String title) {
         // 1) 분석 각도 + 주간핵심제안(실태 + 리서치 방법)
         String anglePrompt = """
             하단 첨부된 아이디어에 대해 두 가지 정보를 반드시 출력하세요.  
@@ -153,6 +153,7 @@ public class ReportGeneratorImpl implements ReportGenerator {
         
         // 4) Report 엔티티 생성
         return Report.builder()
+                .title(title)
                 .idea(idea)
                 .angle(angle)
                 .researchMethod(researchMethod)

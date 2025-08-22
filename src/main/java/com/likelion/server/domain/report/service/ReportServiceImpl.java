@@ -71,7 +71,7 @@ public class ReportServiceImpl implements ReportService {
         IdeaFullInfoDto ideaFullInfoDto = ideaInfoAssembler.toFullInfo(idea);
         String ideaFullInfoText = ideaDescriptionFormatter.toDescription(ideaFullInfoDto);
 
-        Report report = reportGenerator.generate(idea, ideaFullInfoText); // 레포트 생성
+        Report report = reportGenerator.generate(idea, ideaFullInfoText, ideaFullInfoDto.title()); // 레포트 생성
         Report saved = reportRepository.save(report);
         log.debug("Idea 데이터 가공 완료");
 
