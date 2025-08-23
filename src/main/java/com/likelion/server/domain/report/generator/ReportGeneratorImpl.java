@@ -32,6 +32,7 @@ public class ReportGeneratorImpl implements ReportGenerator {
                    - 보고서처럼 간결하고 가독성 있게, AI같지 않게 개조식으로 작성. \s
                    - 마크다운 문법 사용(볼드, 줄바꿈, 리스트). 마침표는 사용하지 마세요.\s
                    - 이모지(🤖, ⚔️, 📌, 💡 등) 적절히 포함. \s
+                    - AI/서비스 트렌드 제목은 간결하게, 핵심 기술명은 _밑줄_ 처리. s
                 
                 [출력 형식] \s
                 각도: <정수> \s
@@ -50,16 +51,16 @@ public class ReportGeneratorImpl implements ReportGenerator {
                 각도: 92
                 주간핵심제안:
                 💡 **최신 트렌드 & 창업 적용 제안**
-                - 🤖 Google Veo 3 / Veo 3 Fast를 당근마켓에 활용 추천
-                  최근 공개된 Google Veo 3는 고해상도 영상과 동기화 오디오를 자동 생성하고 Veo 3 Fast는 짧은 광고·데모 영상 제작에 최적화됨
+                - 🤖 **Google Veo 3 / Veo 3 Fast를 당근마켓에 활용 추천**
+                  최근 공개된 _Google Veo 3_는 고해상도 영상과 동기화 오디오를 자동 생성하고 Veo 3 Fast는 짧은 광고·데모 영상 제작에 최적화됨
                   당근마켓 거래 상품 리뷰·사용법 숏폼 자동 생성 기능 도입 검토 추천
                 
-                - 📌 번개장터 커뮤니티 확장 반응
-                  최근 번개장터 커뮤니티 게시판 개편이 SNS에서 "동네모임+중고거래 결합"으로 화제
+                - 📌 **번개장터 커뮤니티 확장 반응**
+                  최근 번개장터 커뮤니티 게시판 개편이 SNS에서 _동네모임+중고거래 결합_으로 화제
                   긍정적 반응 다수 확인
                   지역 기반 소모임·챌린지 기능 기획 시 참고 필요  
            
-                <입력 데이터>
+                [입력 데이터]
                 아래에 아이디어 설명이 제공됩니다.
                 아이디어 정보: %s  
         """.formatted(ideaFullInfoText);
@@ -86,34 +87,36 @@ public class ReportGeneratorImpl implements ReportGenerator {
         // 주간 핵심 제안 파싱
         String researchMethod = parseBlockSafe(angleResponse, "주간핵심제안");
 
-        
+
         // 2) SWOT
-        String swotPrompt = """
-            다음 아이디어에 대해 맞춤형 SWOT 분석을 해주세요.  
-            - 각 항목은 반드시 'Strength:', 'Weakness:', 'Opportunity:', 'Threat:' 형식으로 시작하세요.  
-            - 각 항목은 **개조식(bullet point)**으로 2~3개 항목 정도 작성하고, 실제 창업자가 공감할 수 있도록 아이디어의 맥락과 시장 상황을 반영하세요.  
-            - 너무 일반적인 문구(예: "시장이 크다")는 피하고, **아이디어만의 특성을 짚어주는 구체적인 인사이트**를 주세요.  
-        
-            [출력 형식 예시]
-            Strength:
-            - 지역 밀착형 거래 문화로 신뢰 확보 용이
-            - “내 주변에서 바로 해결” 경험 → 차별성 강화
-        
-            Weakness:
-            - 초기 거래 데이터 부족 → 추천 정확도 낮음
-            - 지역 단위가 좁으면 이용자 풀이 제한됨
-        
-            Opportunity:
-            - GPT-5, Claude 3.5 등 신형 AI 활용 → 대화형 상담·검색 강화 가능
-            - MZ세대의 지역 커뮤니티 참여 활발 → 빠른 확산 기회
-        
-            Threat:
-            - 당근마켓·번개장터 등 경쟁사 이미 광고·추천 고도화
-            - “또 하나의 중고 앱” 인식 시 차별성 약화
-        
-            아이디어 정보:
-            %s
+                String swotPrompt = """
+                다음 아이디어에 대해 **내 서비스를 아주 잘 아는 시니어 분석가**처럼, 짧고 예리하게 맞춤형 SWOT을 작성하세요.
+                읽는 사람이 '간파당했다'고 느낄 정도로 핵심을 찌르고  불편한 지점도 회피 없이 드러내세요.
+                
+                규칙
+                - 각 섹션은 반드시 'Strength:', 'Weakness:', 'Opportunity:', 'Threat:' 으로 시작
+                - 각 섹션 당 1개씩 **개조식**으로 작성하고 **마침표는 쓰지 않음**
+                - 너무 일반적 문구 금지, 아이디어의 맥락·타깃·운영 제약을 반영한 **개인화 인사이트**로 작성
+                - 가능하면 정량·증거성 표현을 간결히 사용(예: 재방문율, CAC, 이탈 구간 등)
+                
+                [출력 예시]
+                Strength:
+                - 동네 기반 거래라서 이용자 신뢰와 재방문율이 높음
+                
+                Weakness:
+                - 지역 범위가 좁으면 이용자 수가 적어 활성도가 떨어질 수 있음
+                
+                Opportunity:
+                - 최근 등장한 영상 생성 AI를 활용해 상품 리뷰·사용법 영상을 자동으로 만들 수 있음
+                
+                Threat:
+                - 사기나 분쟁이 발생했을 때 대응이 미흡하면 신뢰가 빠르게 하락할 수 있음
+
+                [입력 데이터]
+                아이디어 정보:
+                %s
         """.formatted(ideaFullInfoText);
+
         
         String swotResponse = gptChatService.chatSinglePrompt(swotPrompt);
         String strength    = parseBlockSafe(swotResponse, "Strength");
