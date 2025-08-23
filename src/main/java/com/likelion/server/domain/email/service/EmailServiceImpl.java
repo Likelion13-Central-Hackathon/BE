@@ -10,6 +10,7 @@ import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.domain.user.exception.UserNotFoundByIdeaException;
 import com.likelion.server.infra.mail.MailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ public class EmailServiceImpl implements EmailService {
 
     private final ReportRepository reportRepository;
     private final MailService mailService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -40,7 +42,8 @@ public class EmailServiceImpl implements EmailService {
         }
 
         // 4. 전달받은 이메일과 비밀번호로 사용자 정보를 업데이트
-        user.updateEmailAndPassword(req.email(), req.password());
+        String encodedPassword = passwordEncoder.encode(req.password());
+        user.updateEmailAndPassword(req.email(), encodedPassword);
 
         // 5. 알림 수신 활성화
         idea.activateNotification();
