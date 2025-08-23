@@ -48,6 +48,7 @@ public class MailServiceImpl implements MailService {
             이번 주 리포트가 업데이트되었습니다.
 
             - 리포트 링크: %s
+            분석결과 조회를 눌러주세요!
             """.formatted(reportUrl);
 
         sendText(to, subject, body);
