@@ -6,7 +6,6 @@ import com.likelion.server.domain.idea.repository.IdeaRepository;
 import com.likelion.server.domain.idea.support.IdeaDescriptionFormatter;
 import com.likelion.server.domain.idea.support.IdeaInfoAssembler;
 import com.likelion.server.domain.idea.web.dto.IdeaFullInfoDto;
-import com.likelion.server.domain.recommendedStartupSupport.entity.RecommendedStartupSupport;
 import com.likelion.server.domain.recommendedStartupSupport.exception.RecommendedStartupSupportCreatedException;
 import com.likelion.server.domain.recommendedStartupSupport.exception.NoValidRecommendedStartupSupportException;
 import com.likelion.server.domain.recommendedStartupSupport.service.RecommendedStartupSupportSelector;
@@ -28,7 +27,6 @@ import com.likelion.server.domain.startupSupport.repository.StartupSupportReposi
 import com.likelion.server.domain.user.entity.User;
 import com.likelion.server.domain.user.repository.UserRepository;
 import com.likelion.server.infra.ai.SimilarSupportClient;
-import com.likelion.server.infra.gpt.GptChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +38,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Slf4j
 @Service
@@ -60,6 +60,8 @@ public class ReportServiceImpl implements ReportService {
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy.MM.dd");
     private final StartupSupportRepository startupSupportRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -132,9 +134,14 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportDetailResponse getLatestReport(LatestReportDetailRequest request) {
-        // 이메일/비밀번호로 회원 검증
-        User user = userRepository.findByEmailAndPassword(request.email(), request.password())
+        // 이메일로 회원 불러오기
+        User user = userRepository.findByEmail(request.email())
                 .orElseThrow(AuthFailException::new);
+
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new AuthFailException();
+        }
 
         // 회원 레포트 조회
         Report report = reportRepository

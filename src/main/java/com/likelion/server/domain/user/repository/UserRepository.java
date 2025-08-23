@@ -19,4 +19,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
             @NotBlank(message = "비밀번호는 필수 입력 값 입니다.")
             String password);
+
+    Optional<User> findByEmail(
+            @Email
+            @NotBlank(message = "이메일은 필수 입력 값 입니다.")
+            String email);
 }

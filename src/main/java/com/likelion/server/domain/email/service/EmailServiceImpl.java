@@ -42,7 +42,9 @@ public class EmailServiceImpl implements EmailService {
         }
 
         // 4. 전달받은 이메일과 비밀번호로 사용자 정보를 업데이트
+        System.out.println("password" + req.password());
         String encodedPassword = passwordEncoder.encode(req.password());
+        System.out.println("encodedPassword:" + encodedPassword);
         user.updateEmailAndPassword(req.email(), encodedPassword);
 
         // 5. 알림 수신 활성화
