@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Pattern;
 
 @Entity
 @Getter
@@ -86,19 +87,19 @@ public class StartupSupport extends BaseEntity {
     // FastAPI 응답 DTO -> 엔티티 변환 메서드
     public static StartupSupport toEntity(StartupSupportSyncResponse s) {
         return StartupSupport.builder()
-                .title(s.title())
+                .title(removeDecorativeSymbols(s.title())) //□▲★ 등 기호 제거 메서드 사용
                 .supportArea(s.supportArea())
                 .region(RegionMapper.toEnum(s.region())) // String  → Enum
                 .businessDuration(s.businessDuration())
                 .agency(s.agency())
                 .targetAge(s.targetAge())
-                .target(s.target())
+                .target(removeDecorativeSymbols(s.target())) //□▲★ 등 기호 제거 메서드 사용
                 .contact(s.contact())
                 .link(s.link())
                 .startDate(parseDate(s.startDate())) // yyyy-MM-dd
                 .endDate(parseDate(s.endDate()))
                 .applyMethod(s.applyMethod())
-                .supportDetails(s.supportDetails())
+                .supportDetails(removeDecorativeSymbols(s.supportDetails())) //□▲★ 등 기호 제거 메서드사용
                 .externalRef(s.externalRef())
                 .guidanceUrl(s.guidanceUrl())
                 .isRecruiting(Boolean.TRUE.equals(s.isRecruiting()))
@@ -110,4 +111,15 @@ public class StartupSupport extends BaseEntity {
         if (s == null || s.isBlank()) return null;
         return LocalDate.parse(s, ISO);
     }
+
+    // □▲★ 등 기호 제거 메서드
+    public static String removeDecorativeSymbols(String input) {
+        if (input == null) {
+            return null;
+        }
+        return Pattern.compile("[□■◼◻◽◾▲△▼▽▶▷◀◁◆◇★☆※•·ㆍ‣▣▤▥▧▨▦▩○●◎]")
+                .matcher(input)
+                .replaceAll("");
+    }
+
 }
