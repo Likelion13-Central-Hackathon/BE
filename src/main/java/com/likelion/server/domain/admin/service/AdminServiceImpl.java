@@ -95,7 +95,6 @@ public class AdminServiceImpl implements AdminService{
 
         // 중복 처리
         Set<String> batchExtRefs = new HashSet<>();
-        Set<String> batchTitles  = new HashSet<>();
 
         List<StartupSupport> batch = new ArrayList<>(incoming.size());
 
