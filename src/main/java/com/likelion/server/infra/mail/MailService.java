@@ -2,7 +2,7 @@ package com.likelion.server.infra.mail;
 
 public interface MailService {
 
-    void sendText(String to, String subject, String body);
+    void sendHtml(String to, String subject, String htmlBody, String cidName, String imagePath);
 
     // 1) 구독 신청 확인 메일
     void sendSubscriptionConfirmed(String to);
