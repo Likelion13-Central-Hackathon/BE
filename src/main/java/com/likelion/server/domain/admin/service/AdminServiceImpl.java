@@ -33,7 +33,7 @@ public class AdminServiceImpl implements AdminService{
     // 최신 창업 지원사업 데이터를 수집 및 동기화
     @Override
     @Transactional
-    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 7 * * *", zone = "Asia/Seoul")
     public List<StartupSupportResponse> syncLatestStartupSupports() {
         String syncUrl = apiBaseUrl + "/ai/startup-supports";
 
