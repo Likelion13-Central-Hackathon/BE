@@ -19,6 +19,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import com.likelion.server.domain.startupSupport.mapper.RegionMapper;
+
 
 @ExtendWith(MockitoExtension.class)
 class StartupSupportServiceImplTest {
@@ -60,7 +62,7 @@ class StartupSupportServiceImplTest {
         assertThat(result.get(0).id()).isEqualTo(1L);
         assertThat(result.get(0).title()).isEqualTo("T1");
         assertThat(result.get(0).supportArea()).isEqualTo("A1");
-        assertThat(result.get(0).region()).isEqualTo(RegionMapper.toString(Region.NATIONAL));
+        assertThat(result.get(0).region()).isEqualTo(RegionMapper.toString(Region.NATIONAL));   
         assertThat(result.get(0).link()).isEqualTo("L1");
 
         // 추가로 레포지토리가 요청한 Pageable이 page=0, size=2, startDate DESC인지 확인
