@@ -53,13 +53,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(error.getHttpStatus()).body(error);
     }
 
-    /* request 값을 읽을 수 없을 때 발생 */
+    /* HTTP 요청 바디(JSON) 파싱 중 Enum 변환 실패 또는 다른 형식 오류 처리 */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    protected ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        log.error("HttpMessageNotReadableException error", e);
+    private ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.error("HttpMessageNotReadableException", e);
+
+        // Jackson이 Enum 매핑 실패 시 InvalidFormatException을 던짐
+        if (e.getCause() instanceof com.fasterxml.jackson.databind.exc.InvalidFormatException ife
+                && ife.getTargetType() != null
+                && ife.getTargetType().isEnum()) {
+            ErrorResponse error = ErrorResponse.of(GlobalErrorCode.GLOBAL_INVALID_ENUM);
+            return ResponseEntity.status(error.getHttpStatus()).body(error);
+        }
+
         ErrorResponse error = ErrorResponse.of(GlobalErrorCode.BAD_REQUEST_ERROR);
         return ResponseEntity.status(error.getHttpStatus()).body(error);
     }
+
 
     /* 비지니스 로직 에러 */
     @ExceptionHandler(BaseException.class)
@@ -69,7 +79,6 @@ public class GlobalExceptionHandler {
         ErrorResponse error = ErrorResponse.of(e.getErrorCode());
         return ResponseEntity.status(error.getHttpStatus()).body(error);
     }
-
 
     /* 나머지 예외 처리 */
     @ExceptionHandler(Exception.class)
