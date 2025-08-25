@@ -23,7 +23,7 @@ jobs:
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD:
       # JPA
-      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: true
       # 외부 키(필요 시)
       OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
