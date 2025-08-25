@@ -52,7 +52,7 @@ class StartupSupportServiceImplTest {
 
         // when
         // NATIONAL(전국), page=0, size=2로 호출
-        List<StartupSupportSummaryResponse> result = service.getPagedOpenSupports("NATIONAL", 0, 2);
+        List<StartupSupportSummaryResponse> result = service.getPagedOpenSupports("전국", 0, 2);
 
         // then
         // DTO 필드가 기대대로 매핑되는지 확인
@@ -60,7 +60,7 @@ class StartupSupportServiceImplTest {
         assertThat(result.get(0).id()).isEqualTo(1L);
         assertThat(result.get(0).title()).isEqualTo("T1");
         assertThat(result.get(0).supportArea()).isEqualTo("A1");
-        assertThat(result.get(0).region()).isEqualTo("NATIONAL");
+        assertThat(result.get(0).region()).isEqualTo(RegionMapper.toString(Region.NATIONAL));
         assertThat(result.get(0).link()).isEqualTo("L1");
 
         // 추가로 레포지토리가 요청한 Pageable이 page=0, size=2, startDate DESC인지 확인
