@@ -1,5 +1,7 @@
 package com.likelion.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +16,7 @@ public class ServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ServerApplication.class, args);
 	}
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	@Bean
 	public CommandLineRunner dbConnectionCheck(
@@ -21,10 +24,10 @@ public class ServerApplication {
 			@Value("${spring.datasource.username}") String dbUsername
 	) {
 		return args -> {
-			System.out.println("=== Database Connection Info ===");
-			System.out.println("URL: " + dbUrl);
-			System.out.println("Username: " + dbUsername);
-			System.out.println("================================");
+			log.trace("=== Database Connection Info ===");
+            log.trace("URL: {}", dbUrl);
+            log.trace("Username: {}", dbUsername);
+			log.trace("================================");
 		};
 	}
 }
