@@ -87,3 +87,6 @@ $RECYCLE.BIN/
 *.tmp
 *.bak
 *.old
+
+# 서버 IP 이름으로 생긴 파일/폴더 예방
+**/ubuntu@*
