@@ -18,13 +18,21 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # DB (in-memory H2)
-      SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=0;DATABASE_TO_UPPER=false
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.h2.Driver
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD:
-      # JPA
+      
+      # JPA: 스키마를 매번 새로 만들고 테스트 끝나면 드롭하기
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.H2Dialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
       SPRING_JPA_SHOW_SQL: true
+      LOGGING_LEVEL_org.hibernate.tool.schema: ERROR
+      
+      SPRING_FLYWAY_ENABLED: "false"
+      SPRING_LIQUIBASE_ENABLED: "false"
+      SPRING_SQL_INIT_MODE: never
+    
       # 외부 키(필요 시)
       OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
       OPENAI_TIMEOUT: ${{ secrets.OPENAI_TIMEOUT }}
