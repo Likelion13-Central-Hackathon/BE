@@ -34,6 +34,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+
 // 레포트 관련 핵심 로직 테스트
 @ExtendWith(MockitoExtension.class)
 class ReportServiceImplTest {
@@ -112,10 +113,17 @@ class ReportServiceImplTest {
 
         // then
         assertThat(resp.reportId()).isEqualTo(111L);
-        verify(reportRepository).save(generated);
-        verify(newsGenerator).generate(generated, fullText);
+        
+        verify(reportRepository).save(eq(generated));
+        verify(newsGenerator).generate(eq(generated), eq(fullText));
+        
         verify(recommendedStartupSupportSelector).selectAndSaveTopK(
-                3, generated, fullInfo, argThat(list -> list.containsAll(List.of(ss1, ss2))), fullText
+                eq(3),
+                eq(generated),
+                eq(fullInfo),
+                argThat(list -> list.containsAll(List.of(ss1, ss2))),
+                eq(fullText)
         );
+
     }
 }
