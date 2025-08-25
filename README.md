@@ -3,11 +3,126 @@
 
 > 청년 창업자를 위한 **AI 기반 맞춤형 코칭 & 지원사업 추천 플랫폼**  
 > 초기 창업자의 의사결정과 지원사업 연결을 돕는 Spring Boot 기반 백엔드 서버
+<br>
+
+## 01 Demo Screenshots
+
+### 1. 분석할각? - 아이디어 입력 화면
+아래 화면은 사용자가 창업 아이디어(예: “지역 기반 교육 스타트업”)를 입력하는 초기 화면입니다.
+어떤 분야에서 창업을 고려하고 있는지, 어떤 형태의 지원이 필요한지, 사용자의 창업 업력, 현황, 팀원, 사용가능 자본 규모, 활용가능 자원 준비중인 아이템 등에 대해 상세하게 입력받습니다.
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/a65f6e30-d529-469e-897b-64c12e503841" />
+
+모든 항목을 입력하고 나면, 아래 사진과 같이 로딩페이지가 나오며 AI가 사용자의 입력 내용에 맞게 분석합니다.
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/3929cb99-d74d-4906-9adb-a542e318d03b" />
+
+### 2. 분석할각? - AI 추천 레포트 조회
+아래 화면은 AI가 입력된 아이디어와 해당 지역과 유사한 지원사업을 의미 유사도 기반으로 분석하여, Top-3 결과를 추천한 화면입니다.
+추천된 항목에는 지원기관, 지역, 마감일, 매칭 점수가 함께 표시됩니다.
+AI기반으로 분석한 강점, 약점, 기회, 위협 SWOT분석 결과와 시장적합성, 비즈니스 모델 검증, 브랜드 구축, 성장가능성을 조언해주는 레포트를 생성합니다.
+해당 레포트는 PDF 버튼을 누르면 PDF저장이 가능하며, Mail버튼을 누르고 email/password 입력시 매주 업데이트되는 리포트를 사용자 이메일로 받아 볼 수 있습니다.
+<img width="703" height="771" alt="image" src="https://github.com/user-attachments/assets/2c894b96-1834-45de-b22d-3073e87ee58d" />
+
+### 3. 선정될각? - 사업계획서 첨삭 받기
+아래 사진은 선정될각? 페이지에서 사용자의 사업계획서 첨삭을 도와준 페이지 입니다.
+사업계획서는 총 5개의 문항으로 되어있으며, 각 단계별로 항목에 적합한 내용으로 첨삭을 진행해줍니다. 답변 입력하기 부분에 사용자가 첨삭받을 내용을 입력하면, AI가 해당 내용을 분석하여 지원사업에 붙을 수 있도록 사업계획서에 맞게 첨삭을 도와줍니다.
+오른쪽 문항별 질의응답 예상 질문에 생성하기 버튼을 누르면 사용자 답변을 보고 심사 시 실제로 나올 수 있는 문항별 예상질문을 생성해 줍니다.
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/aa008b2c-c3b9-4937-a080-3d1d1dd71c90" />
+
+## 02 API 응답 예시
+### 1. 최신 레포트 상세 조회
+```
+GET /api/reports/{reportId}
+```
+**Request**
+```
+curl -X GET "https://43.202.138.216.nip.io/api/reports/1"
+```
+**Response**
+```
+{
+  "isSuccess": true,
+  "code": "SUCCESS_200",
+  "httpStatus": 200,
+  "message": "호출에 성공하였습니다.",
+  "data": {
+    "id": 1,
+    "researchMethod": "타겟 고객 인터뷰 및 경쟁제품 벤치마킹",
+    "strength": "팀의 기술 역량이 높음",
+    "weakness": "시장 인지도 부족",
+    "expectedEffect": "초기 전환율 5%p 개선"
+  },
+  "timeStamp": "2025-08-25 19:45:00"
+}
+```
+  
+### 2. 추천 창업 지원사업 조회
+```
+GET /api/reports/{reportId}/recommendations
+```
+**Request**
+```
+curl -X GET "https://43.202.138.216.nip.io/api/reports/1/recommendations"
+```
+**Reponse**
+```
+{
+  "isSuccess": true,
+  "code": "SUCCESS_200",
+  "httpStatus": 200,
+  "message": "호출에 성공하였습니다.",
+  "data": [
+    {
+      "suitability": 96,
+      "supportArea": "창업교육",
+      "agency": "서울과학기술대학교 / 창업지원단",
+      "title": "레이저커팅기 장비교육",
+      "region": "전국",
+      "isRecruiting": false
+    }
+  ],
+  "timeStamp": "2025-08-25 19:45:00"
+}
+```
+
+### 3. AI 첨삭 답변 생성
+```
+POST /api/answers
+```
+**Request**
+```
+curl -X POST "https://43.202.138.216.nip.io/api/answers" \
+-H "Content-Type: application/json" \
+-d '{
+  "questionNumber": 1,
+  "userAnswer": "저희 창업 아이템은 AI 기반 맞춤형 학습 코칭 플랫폼입니다. 사용자의 학습 스타일과 목표를 분석하여 개인별 학습 로드맵을 자동 생성하고, 실시간으로 진도와 성취도를 추적할 수 있는 기능을 제공합니다. 예를 들어, 수험생은 시험 일정과 목표 점수를 입력하면 AI가 최적의 학습 스케줄과 교재를 추천하고, 진행 상황에 따라 보완이 필요한 영역을 분석하여 문제를 제공합니다. 주요 타겟 고객은 대학 입시 준비생과 자격증 취득을 목표로 하는 직장인입니다.""
+}'
+```
+
+**Response**
+```
+{
+  "isSuccess": true,
+  "code": "SUCCESS_200",
+  "httpStatus": 200,
+  "message": "호출에 성공하였습니다.",
+  "data": {
+    "aiAnswer": "저희 창업 아이템은 AI 기반 맞춤형 학습 코칭 플랫폼으로, 사용자의 학습 스타일과 목표를 분석해 개인별 학습 로드맵을 자동 생성하고 실시간으로 진도와 성취도를 추적하는 기능을 제공합니다. 이 플랫폼은 기존 교육 서비스와 차별화된 AI 알고리즘을 통해, 수험생이 시험 일정과 목표 점수를 입력하면 최적의 학습 스케줄과 적합한 교재를 추천합니다. 또한, 학습 진행 상황을 실시간으로 모니터링하여 보완이 필요한 영역을 분석하고 적절한 문제를 제시함으로써 학습의 효율성을 극대화합니다. 시장성 측면에서, 대학 입시 준비생과 자격증 취득을 목표로 하는 직장인을 주요 타겟 고객으로 설정하여, 이들이 갖는 목표 지향적인 학습 니즈를 충족시킬 수 있습니다. 이러한 기능은 고객의 학습 효율을 높이며, 기존의 일률적인 학습법과는 다른 개인 맞춤형 학습 경험을 제공합니다. 성공적인 실행을 위해 사용자 데이터 분석과 AI 알고리즘의 지속적인 개선을 계획하고 있으며, 초기 사용자의 피드백을 통해 플랫폼을 더욱 발전시킬 예정입니다. 해당 타겟 시장의 성장률과 온라인 학습 플랫폼의 수요 증가 추세를 근거로 하여, 본 플랫폼의 시장 잠재력은 매우 높다고 판단됩니다.",
+    "answerId": 10
+  },
+  "timeStamp": "2025-08-25 19:45:00"
+}
+```
+
+- API 명세서 전문: https://www.notion.so/hyejinworkspace/API-2245f14ba7a580cbbb36fc97988ee575
+
+
+## 03 기능 구조도
+<img width="3712" height="1908" alt="image" src="https://github.com/user-attachments/assets/e71f610e-ce0c-42d7-95f3-39560bfcdfe4" />
 
 
 <br>
 
-## 01 서비스 개요
+## 04 서비스 개요
 
 * **문제 정의**
    * 청년 창업자는 두 가지 큰 어려움에 직면
@@ -31,7 +146,7 @@
 <br>
 
 
-## 02 핵심 기능
+## 05 핵심 기능
 
 - **분석할각**: 사용자 입력(역량, 자원)을 기반으로 창업 유형/전략 분석  
 - **선정될각?**: 사업계획서 첨삭 + 예상 Q&A 제공 → 선정 확률 향상  
@@ -42,22 +157,8 @@
 <br>
 
 
-## 03 AI 활용
 
-- **GPT 대비 차별성**  
-  - GPT: 글자 수 제한, 많은 후보 비교에 한계  
-  - 창업할각?: BERT 임베딩 + FAISS(Vector Search)구조를 활용해 모든 공고/아이디어를 벡터화 → 대량 매칭 및 고속 유사도 검색 가능
-- **실질적 연결**  
-  - 단순 참고용 요약이 아닌, 생성된 리포트가 서비스 실행 흐름에 직접 반영  
-- **확장성**  
-  - 수천~수만 건 지원사업에도 확장 가능  
-  - 축적된 데이터로 산업군 트렌드 분석/전략적 의사결정 지원
-
-
-<br>
-
-
-## 04 기술 스택
+## 06 기술 스택
 
 | Tag                    | 기술명                                                                                                            | 설명                                        |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
@@ -89,43 +190,16 @@
 <br>
 
 
-## 05 아키텍처
-
-```mermaid
-flowchart TD
-    User[User] -->|Idea 작성| IdeaService
-    IdeaService --> ReportService
-
-    ReportService -->|리포트 생성| GPTChatService
-    ReportService -->|뉴스 검색| PplxClient
-    ReportService -->|지원사업 유사도 검색·추천| FastAPI
-
-    ReportService --> ReportDB[(Report DB)]
-    IdeaService --> IdeaDB[(Idea DB)]
-    UserService --> UserDB[(User DB)]
-
-    Scheduler -->|매주 월요일 09시| ReportService
-    ReportService --> MailService --> Email[Weekly Report 발송]
-
-    DevOps[GitHub Actions + Docker] --> SpringBootApp[Spring Boot Application]
-    SpringBootApp -->|실행| ReportService
-````
-
-<br>
 
 
-## 06 ERD
+## 07 ERD
 <img width="900" alt="image" src="https://github.com/user-attachments/assets/64142823-a70b-4eaa-b992-d707cbfe298d" />
 
 
 <br>
 
 
-## 07 API 명세서
 
-- https://www.notion.so/hyejinworkspace/API-2245f14ba7a580cbbb36fc97988ee575
-
-<br>
 
 
 ## 08 빠른 실행 가이드
