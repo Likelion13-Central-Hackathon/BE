@@ -75,7 +75,9 @@ class EmailServiceImplTest {
         // then
         assertThat(user.getEmail()).isEqualTo("hjnee222@eugenefn.com");
         assertThat(user.getPassword()).isEqualTo("encodedPw");
-        verify(mailService, times(1)).sendSubscriptionConfirmed("hjnee222@eugenefn.com");
+        verify(mailService, times(1)).sendSubscriptionConfirmed("hjnee222@eugenefn.com"); // 메일 발송 테스트
+        verify(passwordEncoder, times(1)).encode("plainPw"); // 비밀번호 암호화 테스트
+
     }
 
 }
